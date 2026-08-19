@@ -9,14 +9,10 @@ services:
       - "3000:3000"
     environment:
       - DATABASE_URL=${DATABASE_URL}
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_SECRET=${AUTH_SECRET}
+      - ATTEDANCE_QRCODE_KEY=${ATTEDANCE_QRCODE_KEY}
+      - TZ=${TZ:-Asia/Makassar}
       - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
     env_file:
-      - .env.local
+      - .env
     restart: unless-stopped
-    # healthcheck:
-    #   test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 3
-    #   start_period: 40s
