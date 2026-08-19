@@ -1,0 +1,136 @@
+// Prisma schema for Satak Office Attendance
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  HR
+  MANAGER
+  EMPLOYEE
+}
+
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  ABSENT
+  ON_LEAVE
+}
+
+enum LeaveType {
+  ANNUAL
+  SICK
+  UNPAID
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum DepartmentName {
+  ENGINEERING
+  OPERATIONS
+  SALES
+  FINANCE
+  PEOPLE_OPS
+  MARKETING
+}
+
+model User {
+  id           String     @id @default(cuid())
+  name         String
+  username     String     @unique
+  password     String
+  role         Role       @default(EMPLOYEE)
+  imageUrl     String?
+  departmentId String?
+  position     String?
+  joinedAt     DateTime?
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  department    Department?     @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  workSchedules WorkSchedule[]
+  checkIns      CheckIn[]
+  leaves        Leave[]
+
+  @@index([role])
+  @@index([departmentId])
+}
+
+model Department {
+  id        String         @id @default(cuid())
+  name      DepartmentName @unique
+  createdAt DateTime       @default(now())
+
+  users User[]
+}
+
+model Shift {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  startTime    String // "08:00"
+  endTime      String // "17:00"
+  graceMinutes Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  workSchedules WorkSchedule[]
+}
+
+model WorkSchedule {
+  id        String   @id @default(cuid())
+  userId    String
+  shiftId   String
+  createdAt DateTime @default(now())
+
+  user  User   @relation(fields: [userId], references: [id])
+  shift Shift  @relation(fields: [shiftId], references: [id])
+
+  @@unique([userId])
+}
+
+model CheckIn {
+  id          String           @id @default(cuid())
+  userId      String
+  date        DateTime         @db.Date
+  clockIn     DateTime
+  clockOut    DateTime?
+  status      AttendanceStatus @default(PRESENT)
+  lateMinutes Int              @default(0)
+  notes       String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date])
+  @@index([date])
+}
+
+model Leave {
+  id         String      @id @default(cuid())
+  userId     String
+  type       LeaveType
+  status     LeaveStatus @default(PENDING)
+  startDate  DateTime    @db.Date
+  endDate    DateTime    @db.Date
+  reason     String?
+  approvedBy String?
+  approvedAt DateTime?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([status])
+  @@index([startDate, endDate])
+}
