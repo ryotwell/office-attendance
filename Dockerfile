@@ -1,40 +1,49 @@
-# use the official Bun image
-# see all versions at https://hub.docker.com/r/oven/bun/tags
-FROM oven/bun:1 AS base
-WORKDIR /usr/src/app
+# Base image
+FROM oven/bun:1.2-alpine AS base
 
-# install dependencies into temp directory
-# this will cache them and speed up future builds
-FROM base AS install
-RUN mkdir -p /temp/dev
-COPY package.json bun.lock /temp/dev/
-RUN cd /temp/dev && bun install --frozen-lockfile
+# Install dependencies only when needed
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
 
-# copy node_modules from temp directory
-# then copy all (non-ignored) project files into the image
-FROM base AS prerelease
-COPY --from=install /temp/dev/node_modules node_modules
+COPY package.json bun.lock* ./
+RUN bun install --frozen-lockfile
+
+# Generate Prisma Client
+COPY prisma ./prisma/
+RUN bunx prisma generate
+
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# build (prisma generate happens as part of `bun run build`)
-ENV NODE_ENV=production
-ENV DATABASE_URL="postgresql://user:password@localhost:5432/db"
+ENV NEXT_TELEMETRY_DISABLED=1
+
 RUN bun run build
 
-# copy production dependencies and built output into final image
-FROM base AS release
+# Production image, copy all the files and run next
+FROM base AS runner
+WORKDIR /app
+
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+
+# Automatically leverage output traces to reduce image size
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+EXPOSE 3000
+
 ENV PORT=3000
-ENV HOSTNAME=0.0.0.0
+ENV HOSTNAME="0.0.0.0"
 
-COPY --from=prerelease /usr/src/app/node_modules node_modules
-COPY --from=prerelease /usr/src/app/.next ./.next
-COPY --from=prerelease /usr/src/app/public ./public
-COPY --from=prerelease /usr/src/app/prisma ./prisma
-COPY --from=prerelease /usr/src/app/next.config.* ./
-COPY --from=prerelease /usr/src/app/package.json ./
-
-# run the app
-USER bun
-EXPOSE 3000/tcp
-ENTRYPOINT [ "bun", "run", "start" ]
+CMD ["node", "server.js"]
