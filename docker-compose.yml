@@ -1,18 +1,22 @@
-version: '3.8'
+version: "3.8"
 
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
+
     ports:
       - "3000:3000"
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - NEXTAUTH_SECRET=${AUTH_SECRET}
-      - ATTEDANCE_QRCODE_KEY=${ATTEDANCE_QRCODE_KEY}
-      - TZ=${TZ:-Asia/Makassar}
-      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+
     env_file:
       - .env
+
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      NEXTAUTH_SECRET: ${AUTH_SECRET}
+      ATTEDANCE_QRCODE_KEY: ${ATTEDANCE_QRCODE_KEY}
+      TZ: ${TZ:-Asia/Makassar}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+
     restart: unless-stopped
