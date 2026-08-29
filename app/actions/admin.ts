@@ -446,7 +446,16 @@ export type DashboardStats = {
 }
 
 function dayStartUTC(date = new Date()) {
-  const [y, m, d] = [date.getFullYear(), date.getMonth() + 1, date.getDate()]
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Makassar",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  })
+  const parts = formatter.formatToParts(date)
+  const y = Number(parts.find((p) => p.type === "year")?.value)
+  const m = Number(parts.find((p) => p.type === "month")?.value)
+  const d = Number(parts.find((p) => p.type === "day")?.value)
   return new Date(Date.UTC(y, m - 1, d))
 }
 

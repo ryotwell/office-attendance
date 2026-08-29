@@ -41,10 +41,17 @@ export async function POST(req: Request) {
   }
 
   const now = new Date()
-  const today = new Date(now)
-  today.setHours(0, 0, 0, 0)
 
-  // getDay(): 0 = Sunday → day off.
+  // "Today" as a date-only key, stored as UTC midnight of the LOCAL calendar
+  // day (getFullYear/getMonth/getDate read local components under process
+  // TZ, then Date.UTC encodes them as a UTC timestamp). This must match the
+  // same construction used in dashboard queries (utcDay in dashboard.ts),
+  // otherwise CheckIn.date won't line up with the ranges dashboards query by.
+  const today = new Date(
+    Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())
+  )
+
+  // getDay(): 0 = Sunday → day off. (Local calendar day, same basis as `today`.)
   if (now.getDay() === 0) {
     return NextResponse.json({ error: "Sunday is a day off" }, { status: 409 })
   }
@@ -62,17 +69,19 @@ export async function POST(req: Request) {
     )
   }
 
-  // start = today's shift startTime. Clock-in must land on/after it.
+  // start = today's shift startTime, evaluated in local (process TZ) time
+  // since it's compared directly against `now`. Clock-in must land on/after it.
   const [sh, sm] = schedule.shift.startTime.split(":").map(Number)
-  const start = new Date(today)
+  const start = new Date(now)
   start.setHours(sh, sm, 0, 0)
 
-  // end = today's shift endTime. Clock-in must land before it; clock-out only
-  // after it (no leaving before the shift is done).
+  // end = today's shift endTime, same local-time basis as `start`. Clock-in
+  // must land before it; clock-out only after it (no leaving before the
+  // shift is done).
   const [eh, em] = schedule.shift.endTime.split(":").map(Number)
-  const end = new Date(today)
+  const end = new Date(now)
   end.setHours(eh, em, 0, 0)
-  if (eh === 0) end.setDate(end.getDate() + 1) // endTime "00:00" → midnight after tonight
+  if (eh === 0 && em === 0) end.setDate(end.getDate() + 1) // endTime "00:00" → midnight after tonight
 
   const existing = await prisma.checkIn.findUnique({
     where: { userId_date: { userId: user.id, date: today } },

@@ -35,7 +35,7 @@ async function main() {
 
   // Default accounts (stable logins)
   const defaultUsers = [
-    { name: "Oki", username: "oki", role: Role.ADMIN, position: "Administrator", department: DepartmentName.PEOPLE_OPS },
+    { name: "Sardi Mirza", username: "sardi_mirza", role: Role.ADMIN, position: "Administrator", department: DepartmentName.PEOPLE_OPS },
     { name: "Test Karyawan", username: "karyawan_test", role: Role.EMPLOYEE, position: "Sales", department: DepartmentName.SALES },
   ];
 
