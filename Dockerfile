@@ -1,7 +1,7 @@
 # =========================
 # Base
 # =========================
-FROM oven/bun:1.2-alpine AS base
+FROM node:22-alpine AS base
 
 
 # =========================
@@ -14,20 +14,16 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 
-# Copy package
-COPY package.json bun.lock* ./
+COPY package.json package-lock.json* ./
 
 
-# Install dependencies
-RUN bun install --frozen-lockfile
+RUN npm install
 
 
-# Copy prisma schema
 COPY prisma ./prisma/
 
 
-# Generate Prisma Client
-RUN bunx prisma generate
+RUN npx prisma generate
 
 
 
@@ -39,30 +35,26 @@ FROM base AS builder
 WORKDIR /app
 
 
-# Copy node_modules
 COPY --from=deps /app/node_modules ./node_modules
 
 
-# COPY HASIL PRISMA GENERATE
-# ini bagian yang diperbaiki
 COPY --from=deps /app/generated ./generated
 
 
-# Copy source code
 COPY . .
 
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
 
-RUN bun run build
+RUN npm run build
 
 
 
 # =========================
 # Runner
 # =========================
-FROM base AS runner
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 
@@ -76,22 +68,16 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 
-
-# Copy public
 COPY --from=builder /app/public ./public
 
 
-# Copy Next standalone
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 
 
-# Copy static
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 
-# Copy generated prisma (jika diperlukan runtime)
 COPY --from=builder --chown=nextjs:nodejs /app/generated ./generated
-
 
 
 USER nextjs
