@@ -138,7 +138,7 @@ export function QrScanner() {
         }`}
       >
         {state === "scanning" && <span>Sedang scan…</span>}
-        {message || (state === "idle" ? "Arahkan kamera ke kode QR karyawan" : "")}
+        {message || (state === "idle" ? "Arahkan kamera ke kode QRCode" : "")}
       </div>
     </div>
   )
