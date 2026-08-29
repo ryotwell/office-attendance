@@ -6,99 +6,102 @@ import { prisma } from "@/lib/prisma"
 const QR_CODE_KEY = process.env.ATTEDANCE_QRCODE_KEY
 
 // POST /api/attendance/scan  { token }
-// Kiosk scan: the token must match ATTEDANCE_QRCODE_KEY in .env. First scan
-// of a day clocks in; a later scan clocks out. Attendance works every day
-// except Sunday (no WorkSchedule check per day — a schedule applies daily).
-// Clock-in is rejected before shift.startTime and after shift.endTime.
-// Clock-out is rejected before shift.endTime (no early clock-out).
-// Shift start (+grace) decides PRESENT/LATE.
+// Kiosk scan: token harus cocok dengan ATTEDANCE_QRCODE_KEY di .env. Scan
+// pertama dalam sehari = clock in; scan berikutnya = clock out. Absensi
+// berlaku setiap hari kecuali Minggu (tidak ada cek WorkSchedule per hari —
+// satu jadwal berlaku untuk semua hari kerja).
+// Clock-in ditolak sebelum shift.startTime dan setelah shift.endTime.
+// Clock-out ditolak sebelum shift.endTime (tidak boleh pulang lebih awal).
+// Shift start (+ toleransi) menentukan status PRESENT/LATE.
 export async function POST(req: Request) {
   const session = await auth()
   if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Tidak diizinkan" }, { status: 401 })
   }
   if (!QR_CODE_KEY) {
     return NextResponse.json(
-      { error: "Server not configured for scanning" },
+      { error: "Server belum dikonfigurasi untuk scan" },
       { status: 500 }
     )
   }
 
   const { token } = await req.json().catch(() => ({}))
   if (typeof token !== "string" || !token.trim()) {
-    return NextResponse.json({ error: "Missing QR token" }, { status: 400 })
+    return NextResponse.json({ error: "Token QR tidak ada" }, { status: 400 })
   }
 
   if (token.trim() !== QR_CODE_KEY) {
-    return NextResponse.json({ error: "Invalid QR code" }, { status: 403 })
+    return NextResponse.json({ error: "Kode QR tidak valid" }, { status: 403 })
   }
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
   })
   if (!user || !user.isActive) {
-    return NextResponse.json({ error: "Account not found" }, { status: 404 })
+    return NextResponse.json({ error: "Akun tidak ditemukan" }, { status: 404 })
   }
 
   const now = new Date()
 
-  // "Today" as a date-only key, stored as UTC midnight of the LOCAL calendar
-  // day (getFullYear/getMonth/getDate read local components under process
-  // TZ, then Date.UTC encodes them as a UTC timestamp). This must match the
-  // same construction used in dashboard queries (utcDay in dashboard.ts),
-  // otherwise CheckIn.date won't line up with the ranges dashboards query by.
+  // "Hari ini" sebagai kunci tanggal, disimpan sebagai UTC midnight dari
+  // hari kalender LOKAL (getFullYear/getMonth/getDate membaca komponen
+  // lokal sesuai TZ proses, lalu Date.UTC meng-encode-nya sebagai timestamp
+  // UTC). Ini harus sama persis dengan konstruksi yang dipakai di query
+  // dashboard (utcDay di dashboard.ts), kalau tidak, CheckIn.date tidak
+  // akan cocok dengan rentang yang di-query dashboard.
   const today = new Date(
     Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())
   )
 
-  // getDay(): 0 = Sunday → day off. (Local calendar day, same basis as `today`.)
+  // getDay(): 0 = Minggu → hari libur. (Hari kalender lokal, basis yang sama dengan `today`.)
   if (now.getDay() === 0) {
-    return NextResponse.json({ error: "Sunday is a day off" }, { status: 409 })
+    return NextResponse.json({ error: "Hari Minggu libur" }, { status: 409 })
   }
 
-  // Attendance requires a WorkSchedule for this user. A schedule is unique
-  // per user and applies to every working day.
+  // Absensi membutuhkan WorkSchedule untuk user ini. Satu schedule bersifat
+  // unik per user dan berlaku untuk setiap hari kerja.
   const schedule = await prisma.workSchedule.findUnique({
     where: { userId: user.id },
     include: { shift: true },
   })
   if (!schedule) {
     return NextResponse.json(
-      { error: "No work schedule set" },
+      { error: "Jadwal kerja belum diatur" },
       { status: 409 }
     )
   }
 
-  // start = today's shift startTime, evaluated in local (process TZ) time
-  // since it's compared directly against `now`. Clock-in must land on/after it.
+  // start = startTime shift hari ini, dihitung dalam local time (TZ proses)
+  // karena langsung dibandingkan dengan `now`. Clock-in harus terjadi
+  // pada/setelah waktu ini.
   const [sh, sm] = schedule.shift.startTime.split(":").map(Number)
   const start = new Date(now)
   start.setHours(sh, sm, 0, 0)
 
-  // end = today's shift endTime, same local-time basis as `start`. Clock-in
-  // must land before it; clock-out only after it (no leaving before the
-  // shift is done).
+  // end = endTime shift hari ini, basis local time yang sama dengan `start`.
+  // Clock-in harus terjadi sebelum ini; clock-out hanya boleh setelah ini
+  // (tidak boleh pulang sebelum shift selesai).
   const [eh, em] = schedule.shift.endTime.split(":").map(Number)
   const end = new Date(now)
   end.setHours(eh, em, 0, 0)
-  if (eh === 0 && em === 0) end.setDate(end.getDate() + 1) // endTime "00:00" → midnight after tonight
+  if (eh === 0 && em === 0) end.setDate(end.getDate() + 1) // endTime "00:00" → tengah malam nanti malam
 
   const existing = await prisma.checkIn.findUnique({
     where: { userId_date: { userId: user.id, date: today } },
   })
   if (existing) {
-    // Clocked in today → this scan is a clock-out.
+    // Sudah clock in hari ini → scan ini berarti clock out.
     if (existing.clockOut) {
       return NextResponse.json(
-        { error: `${user.name} already checked out today` },
+        { error: `${user.name} sudah check out hari ini` },
         { status: 409 }
       )
     }
 
-    // Cannot clock out before the shift finishes.
+    // Tidak boleh clock out sebelum shift selesai.
     if (now < end) {
       return NextResponse.json(
-        { error: `Shift not finished yet (ends at ${schedule.shift.endTime})` },
+        { error: `Shift belum selesai (berakhir jam ${schedule.shift.endTime})` },
         { status: 409 }
       )
     }
@@ -123,24 +126,24 @@ export async function POST(req: Request) {
     })
   }
 
-  // No record yet → this scan is a clock-in.
+  // Belum ada record → scan ini berarti clock in.
 
-  // Cannot clock in before the shift starts.
+  // Tidak boleh clock in sebelum shift mulai.
   if (now < start) {
     return NextResponse.json(
-      { error: `Shift not started yet (starts at ${schedule.shift.startTime})` },
+      { error: `Shift belum mulai (mulai jam ${schedule.shift.startTime})` },
       { status: 409 }
     )
   }
 
   if (now > end) {
     return NextResponse.json(
-      { error: "Shift already over for today" },
+      { error: "Shift hari ini sudah berakhir" },
       { status: 409 }
     )
   }
 
-  // Lateness: after (shift start + grace minutes).
+  // Keterlambatan: setelah (waktu mulai shift + menit toleransi).
   const graceEnd = new Date(start.getTime() + schedule.shift.graceMinutes * 60_000)
 
   let status: "PRESENT" | "LATE" = "PRESENT"

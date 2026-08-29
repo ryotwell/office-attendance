@@ -19,19 +19,19 @@ export default function ScanPage() {
         <CardHeader className="text-center">
           <Image
             src="/assets/logo.png"
-            alt="Satak Office Attendance logo"
+            alt="Logo Satak Office Attendance"
             width={48}
             height={48}
             className="mx-auto mb-2 h-auto w-auto"
           />
-          <CardTitle>Scan Attendance</CardTitle>
-          <CardDescription>Scan your employee QR to check in</CardDescription>
+          <CardTitle>Scan Absensi</CardTitle>
+          <CardDescription>Scan kode QR untuk check in</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <QrScanner />
           <form action={signOutAction}>
             <Button type="submit" variant="outline" className="w-full">
-              Sign out
+              Keluar
             </Button>
           </form>
         </CardContent>

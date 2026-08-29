@@ -13,8 +13,9 @@ export function QrScanner() {
   const [state, setState] = useState<ScanState>("idle")
   const [message, setMessage] = useState("")
 
-  // Freeze the scanner the instant a code is decoded so a held QR cannot fire
-  // repeatedly. The watchdog below relaunches the SAME instance afterwards.
+  // Bekukan scanner begitu sebuah kode berhasil didecode, supaya QR yang
+  // masih disorongkan ke kamera tidak terus-menerus ke-scan berulang.
+  // Watchdog di bawah akan menyalakan ulang instance yang SAMA setelahnya.
   const handleScan = useCallback(async (decodedText: string) => {
     const scanner = scannerRef.current
     if (scanner?.isScanning) {
@@ -22,7 +23,7 @@ export function QrScanner() {
     }
 
     setState("scanning")
-    setMessage("Submitting…")
+    setMessage("Mengirim…")
 
     try {
       const res = await fetch("/api/attendance/scan", {
@@ -33,20 +34,20 @@ export function QrScanner() {
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
         setState("error")
-        setMessage(data.error ?? "Scan failed")
+        setMessage(data.error ?? "Scan gagal")
         return
       }
       setState("success")
-      // Same QR. First scan of the day clocks in (clockOut is null);
-      // a later scan clocks out — say which happened.
+      // QR yang sama. Scan pertama hari itu = clock in (clockOut masih
+      // null); scan berikutnya = clock out — tampilkan mana yang terjadi.
       setMessage(
         [
           data.clockOut
-            ? `Checked out ${data.employee?.name ?? ""}`
-            : `Checked in ${data.employee?.name ?? ""}`,
+            ? `Check out ${data.employee?.name ?? ""}`
+            : `Check in ${data.employee?.name ?? ""}`,
           data.schedule
             ? `Shift ${data.schedule.shift} · ${data.schedule.startTime} – ${data.schedule.endTime}`
-            : "No schedule today",
+            : "Tidak ada jadwal hari ini",
           data.clockOut ?? data.clockIn ?? "",
         ]
           .filter(Boolean)
@@ -54,7 +55,7 @@ export function QrScanner() {
       )
     } catch {
       setState("error")
-      setMessage("Network error, try again")
+      setMessage("Terjadi kesalahan jaringan, coba lagi")
     }
   }, [])
 
@@ -81,7 +82,8 @@ export function QrScanner() {
     [handleScan]
   )
 
-  // Kiosk stays live: pause on a verdict, then resume on the same instance.
+  // Kiosk tetap menyala: berhenti sejenak setelah ada hasil, lalu
+  // dilanjutkan lagi pada instance yang sama.
   useEffect(() => {
     if (state !== "success" && state !== "error") return
     const t = setTimeout(() => {
@@ -102,10 +104,11 @@ export function QrScanner() {
     void startScanner(scanner)
 
     return () => {
-      // StrictMode / React 19 double-mounts effects, but the DOM element is
-      // still mounted during a synthetic unmount. Only tear down when the
-      // element is truly gone (real navigation away). This keeps ONE instance
-      // alive across StrictMode remounts — the duplicate-video bug.
+      // StrictMode / React 19 me-mount effect dua kali, tapi elemen DOM
+      // masih terpasang selama unmount sintetis tersebut. Hanya benar-benar
+      // bongkar instance ketika elemennya sungguh-sungguh hilang (navigasi
+      // sebenarnya keluar dari halaman). Ini menjaga HANYA SATU instance
+      // yang hidup selama remount StrictMode — mencegah bug video ganda.
       if (!document.getElementById("qr-reader")) {
         initializedRef.current = false
         scannerRef.current = null
@@ -134,8 +137,8 @@ export function QrScanner() {
               : "bg-muted text-muted-foreground"
         }`}
       >
-        {state === "scanning" && <span>Scanning…</span>}
-        {message || (state === "idle" ? "Point the camera at an employee QR code" : "")}
+        {state === "scanning" && <span>Sedang scan…</span>}
+        {message || (state === "idle" ? "Arahkan kamera ke kode QR karyawan" : "")}
       </div>
     </div>
   )
