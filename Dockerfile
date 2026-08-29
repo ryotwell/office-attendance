@@ -13,14 +13,20 @@ RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
+
+# Copy package
 COPY package.json bun.lock* ./
 
+
+# Install dependencies
 RUN bun install --frozen-lockfile
 
 
-# Generate Prisma Client
+# Copy prisma schema
 COPY prisma ./prisma/
 
+
+# Generate Prisma Client
 RUN bunx prisma generate
 
 
@@ -32,8 +38,17 @@ FROM base AS builder
 
 WORKDIR /app
 
+
+# Copy node_modules
 COPY --from=deps /app/node_modules ./node_modules
 
+
+# COPY HASIL PRISMA GENERATE
+# ini bagian yang diperbaiki
+COPY --from=deps /app/generated ./generated
+
+
+# Copy source code
 COPY . .
 
 
@@ -62,12 +77,20 @@ RUN adduser --system --uid 1001 nextjs
 
 
 
+# Copy public
 COPY --from=builder /app/public ./public
 
 
+# Copy Next standalone
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 
+
+# Copy static
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+
+# Copy generated prisma (jika diperlukan runtime)
+COPY --from=builder --chown=nextjs:nodejs /app/generated ./generated
 
 
 
