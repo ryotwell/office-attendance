@@ -85,7 +85,7 @@ const shiftOptions = Object.values(Shift).map((v) => {
   }
 })
 
-const ALL_VALUE = "__all__"
+const ALL_VALUE = "SEMUA"
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
 
 // Enum values look like "PEOPLE_OPS" — format them into "People Ops" for display.
