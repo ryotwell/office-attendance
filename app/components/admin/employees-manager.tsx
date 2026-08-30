@@ -28,6 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -219,103 +220,161 @@ export function EmployeesManager({
               />
             </div>
 
-            <Select value={departmentFilter} onValueChange={(v) => setDepartmentFilter(v ?? ALL_VALUE)}>
-              <SelectTrigger className="w-full sm:w-[170px]">
-                <SelectValue placeholder="Departemen" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ALL_VALUE}>Semua Departemen</SelectItem>
-                {departmentOptions.map((d) => (
-                  <SelectItem key={d.value} value={d.value}>
-                    {d.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
+              <Select value={departmentFilter} onValueChange={(v) => setDepartmentFilter(v ?? ALL_VALUE)}>
+                <SelectTrigger className="w-full sm:w-[170px]">
+                  <SelectValue placeholder="Departemen" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ALL_VALUE}>Semua Departemen</SelectItem>
+                  {departmentOptions.map((d) => (
+                    <SelectItem key={d.value} value={d.value}>
+                      {d.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            <Select value={roleFilter} onValueChange={(v) => setRoleFilter(v ?? ALL_VALUE)}>
-              <SelectTrigger className="w-full sm:w-[140px]">
-                <SelectValue placeholder="Role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ALL_VALUE}>Semua Role</SelectItem>
-                {roleOptions.map((r) => (
-                  <SelectItem key={r.value} value={r.value}>
-                    {r.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <Select value={roleFilter} onValueChange={(v) => setRoleFilter(v ?? ALL_VALUE)}>
+                <SelectTrigger className="w-full sm:w-[140px]">
+                  <SelectValue placeholder="Role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ALL_VALUE}>Semua Role</SelectItem>
+                  {roleOptions.map((r) => (
+                    <SelectItem key={r.value} value={r.value}>
+                      {r.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            <Select value={shiftFilter} onValueChange={(v) => setShiftFilter(v ?? ALL_VALUE)}>
-              <SelectTrigger className="w-full sm:w-[150px]">
-                <SelectValue placeholder="Shift" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ALL_VALUE}>Semua Shift</SelectItem>
-                {Object.values(Shift).map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {s}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <Select value={shiftFilter} onValueChange={(v) => setShiftFilter(v ?? ALL_VALUE)}>
+                <SelectTrigger className="col-span-2 w-full sm:col-span-1 sm:w-[150px]">
+                  <SelectValue placeholder="Shift" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ALL_VALUE}>Semua Shift</SelectItem>
+                  {Object.values(Shift).map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            {hasActiveFilters ? (
-              <Button variant="ghost" size="sm" onClick={resetFilters}>
-                Reset
-              </Button>
-            ) : null}
+              {hasActiveFilters ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={resetFilters}
+                  className="col-span-2 sm:col-span-1 sm:w-auto"
+                >
+                  Reset
+                </Button>
+              ) : null}
+            </div>
           </div>
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nama</TableHead>
-                <TableHead>Departemen</TableHead>
-                <TableHead>Posisi</TableHead>
-                <TableHead>Shift</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead className="text-right">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedEmployees.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                    Tidak ada karyawan yang cocok.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                paginatedEmployees.map((emp) => (
-                  <TableRow key={emp.id}>
-                    <TableCell>
-                      <div className="font-medium">{emp.name}</div>
-                      <div className="text-xs text-muted-foreground">{emp.username}</div>
-                    </TableCell>
-                    <TableCell>{formatDepartmentLabel(emp.department)}</TableCell>
-                    <TableCell>{emp.position}</TableCell>
-                    <TableCell className="text-muted-foreground">{emp.shift}</TableCell>
-                    <TableCell className="text-muted-foreground">{emp.role}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button variant="ghost" size="icon-sm" onClick={() => openEdit(emp)}>
-                          <Pencil />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          onClick={() => setDeleteTarget(emp)}
-                        >
-                          <Trash2 />
-                        </Button>
+          {/* Mobile: card list */}
+          <div className="flex flex-col gap-3 md:hidden">
+            {paginatedEmployees.length === 0 ? (
+              <div className="rounded-lg border py-10 text-center text-sm text-muted-foreground">
+                Tidak ada karyawan yang cocok.
+              </div>
+            ) : (
+              paginatedEmployees.map((emp) => (
+                <div key={emp.id} className="rounded-lg border p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="truncate font-medium">{emp.name}</div>
+                      <div className="truncate text-xs text-muted-foreground">
+                        {emp.username}
                       </div>
+                    </div>
+                    <div className="flex shrink-0 gap-1">
+                      <Button variant="ghost" size="icon-sm" onClick={() => openEdit(emp)}>
+                        <Pencil />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => setDeleteTarget(emp)}
+                      >
+                        <Trash2 />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    <Badge variant="secondary">
+                      {formatDepartmentLabel(emp.department)}
+                    </Badge>
+                    <Badge variant="outline">{emp.shift}</Badge>
+                    <Badge variant="outline">{emp.role}</Badge>
+                  </div>
+
+                  {emp.position ? (
+                    <div className="mt-2 text-sm text-muted-foreground">
+                      {emp.position}
+                    </div>
+                  ) : null}
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Desktop / tablet: table */}
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nama</TableHead>
+                  <TableHead>Departemen</TableHead>
+                  <TableHead>Posisi</TableHead>
+                  <TableHead>Shift</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead className="text-right">Aksi</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedEmployees.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                      Tidak ada karyawan yang cocok.
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  paginatedEmployees.map((emp) => (
+                    <TableRow key={emp.id}>
+                      <TableCell>
+                        <div className="font-medium">{emp.name}</div>
+                        <div className="text-xs text-muted-foreground">{emp.username}</div>
+                      </TableCell>
+                      <TableCell>{formatDepartmentLabel(emp.department)}</TableCell>
+                      <TableCell>{emp.position}</TableCell>
+                      <TableCell className="text-muted-foreground">{emp.shift}</TableCell>
+                      <TableCell className="text-muted-foreground">{emp.role}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button variant="ghost" size="icon-sm" onClick={() => openEdit(emp)}>
+                            <Pencil />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => setDeleteTarget(emp)}
+                          >
+                            <Trash2 />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
 
           {/* Pagination */}
           <div className="mt-4 flex flex-col-reverse items-center justify-between gap-3 sm:flex-row">
@@ -325,8 +384,8 @@ export function EmployeesManager({
                 : `Menampilkan ${rangeStart}–${rangeEnd} dari ${totalItems} karyawan`}
             </p>
 
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
+            <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
+              <div className="flex items-center justify-between gap-2 sm:justify-start">
                 <span className="text-sm text-muted-foreground">Baris</span>
                 <Select
                   value={String(pageSize)}
@@ -345,7 +404,7 @@ export function EmployeesManager({
                 </Select>
               </div>
 
-              <div className="flex items-center gap-1">
+              <div className="flex items-center justify-between gap-1 sm:justify-start">
                 <Button
                   variant="outline"
                   size="sm"
@@ -372,7 +431,7 @@ export function EmployeesManager({
       </Card>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent className="sm:max-w-lg">
+        <SheetContent className="w-full sm:max-w-lg">
           <SheetHeader className="border-b">
             <SheetTitle>{editing ? "Edit Karyawan" : "Tambah Karyawan"}</SheetTitle>
           </SheetHeader>
