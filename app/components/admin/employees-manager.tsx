@@ -55,6 +55,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { cn } from "@/lib/utils"
 import shifts from '@/data/shift.json'
 
 type ShiftDetail = {
@@ -101,6 +102,55 @@ const departmentOptions = Object.values(Department).map((v) => ({
   value: v,
   label: formatDepartmentLabel(v),
 }))
+
+// --- Badge color mapping ---
+// Kelas warna badge per nilai enum, light & dark mode. Warna dipilih agar
+// mudah dibedakan sekilas dan tidak bentrok dengan warna status lain di app.
+const BADGE_BASE =
+  "border-transparent font-medium"
+
+const ROLE_COLORS: Record<RoleType, string> = {
+  ADMIN: "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400",
+  HR: "bg-purple-100 text-purple-700 dark:bg-purple-500/15 dark:text-purple-400",
+  MANAGER: "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400",
+  EMPLOYEE: "bg-slate-100 text-slate-700 dark:bg-slate-500/15 dark:text-slate-300",
+}
+
+const SHIFT_COLORS: Record<ShiftType, string> = {
+  PAGI: "bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-400",
+  SIANG: "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-400",
+  FULLTIME: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400",
+  PAGIATAUSIANG: "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-400",
+}
+
+const DEPARTMENT_COLORS: Record<DepartmentType, string> = {
+  ENGINEERING: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400",
+  OPERATIONS: "bg-cyan-100 text-cyan-700 dark:bg-cyan-500/15 dark:text-cyan-400",
+  SALES: "bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400",
+  FINANCE: "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-400",
+  PEOPLE_OPS: "bg-pink-100 text-pink-700 dark:bg-pink-500/15 dark:text-pink-400",
+  MARKETING: "bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-400",
+}
+
+function RoleBadge({ value }: { value: RoleType }) {
+  return (
+    <Badge className={cn(BADGE_BASE, ROLE_COLORS[value])}>{value}</Badge>
+  )
+}
+
+function ShiftBadge({ value }: { value: ShiftType }) {
+  return (
+    <Badge className={cn(BADGE_BASE, SHIFT_COLORS[value])}>{value}</Badge>
+  )
+}
+
+function DepartmentBadge({ value }: { value: DepartmentType }) {
+  return (
+    <Badge className={cn(BADGE_BASE, DEPARTMENT_COLORS[value])}>
+      {formatDepartmentLabel(value)}
+    </Badge>
+  )
+}
 
 function toDateInput(value?: string | Date | null) {
   if (!value) return ""
@@ -307,11 +357,9 @@ export function EmployeesManager({
                   </div>
 
                   <div className="mt-2 flex flex-wrap gap-1.5">
-                    <Badge variant="secondary">
-                      {formatDepartmentLabel(emp.department)}
-                    </Badge>
-                    <Badge variant="outline">{emp.shift}</Badge>
-                    <Badge variant="outline">{emp.role}</Badge>
+                    <DepartmentBadge value={emp.department} />
+                    <ShiftBadge value={emp.shift} />
+                    <RoleBadge value={emp.role} />
                   </div>
 
                   {emp.position ? (
@@ -351,10 +399,16 @@ export function EmployeesManager({
                         <div className="font-medium">{emp.name}</div>
                         <div className="text-xs text-muted-foreground">{emp.username}</div>
                       </TableCell>
-                      <TableCell>{formatDepartmentLabel(emp.department)}</TableCell>
+                      <TableCell>
+                        <DepartmentBadge value={emp.department} />
+                      </TableCell>
                       <TableCell>{emp.position}</TableCell>
-                      <TableCell className="text-muted-foreground">{emp.shift}</TableCell>
-                      <TableCell className="text-muted-foreground">{emp.role}</TableCell>
+                      <TableCell>
+                        <ShiftBadge value={emp.shift} />
+                      </TableCell>
+                      <TableCell>
+                        <RoleBadge value={emp.role} />
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
                           <Button variant="ghost" size="icon-sm" onClick={() => openEdit(emp)}>
