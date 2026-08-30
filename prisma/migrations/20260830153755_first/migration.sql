@@ -11,10 +11,10 @@ CREATE TYPE "LeaveType" AS ENUM ('ANNUAL', 'SICK', 'UNPAID');
 CREATE TYPE "LeaveStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 
 -- CreateEnum
-CREATE TYPE "DepartmentName" AS ENUM ('ENGINEERING', 'OPERATIONS', 'SALES', 'FINANCE', 'PEOPLE_OPS', 'MARKETING');
+CREATE TYPE "Department" AS ENUM ('ENGINEERING', 'OPERATIONS', 'SALES', 'FINANCE', 'PEOPLE_OPS', 'MARKETING');
 
 -- CreateEnum
-CREATE TYPE "Shift" AS ENUM ('PAGI', 'SIANG', 'FULLTIME');
+CREATE TYPE "Shift" AS ENUM ('PAGI', 'SIANG', 'FULLTIME', 'PAGIATAUSIANG');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -24,7 +24,7 @@ CREATE TABLE "User" (
     "password" TEXT NOT NULL,
     "role" "Role" NOT NULL DEFAULT 'EMPLOYEE',
     "imageUrl" TEXT,
-    "departmentId" TEXT,
+    "department" "Department" NOT NULL,
     "position" TEXT,
     "joinedAt" TIMESTAMP(3),
     "isActive" BOOLEAN NOT NULL DEFAULT true,
@@ -33,15 +33,6 @@ CREATE TABLE "User" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Department" (
-    "id" TEXT NOT NULL,
-    "name" "DepartmentName" NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "Department_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -54,6 +45,7 @@ CREATE TABLE "CheckIn" (
     "status" "AttendanceStatus" NOT NULL DEFAULT 'PRESENT',
     "lateMinutes" INTEGER NOT NULL DEFAULT 0,
     "notes" TEXT,
+    "effectiveShift" "Shift" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -84,12 +76,6 @@ CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 CREATE INDEX "User_role_idx" ON "User"("role");
 
 -- CreateIndex
-CREATE INDEX "User_departmentId_idx" ON "User"("departmentId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Department_name_key" ON "Department"("name");
-
--- CreateIndex
 CREATE INDEX "CheckIn_date_idx" ON "CheckIn"("date");
 
 -- CreateIndex
@@ -100,9 +86,6 @@ CREATE INDEX "Leave_status_idx" ON "Leave"("status");
 
 -- CreateIndex
 CREATE INDEX "Leave_startDate_endDate_idx" ON "Leave"("startDate", "endDate");
-
--- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_departmentId_fkey" FOREIGN KEY ("departmentId") REFERENCES "Department"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "CheckIn" ADD CONSTRAINT "CheckIn_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

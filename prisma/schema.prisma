@@ -35,7 +35,7 @@ enum LeaveStatus {
   REJECTED
 }
 
-enum DepartmentName {
+enum Department {
   ENGINEERING
   OPERATIONS
   SALES
@@ -58,7 +58,7 @@ model User {
   password     String
   role         Role       @default(EMPLOYEE)
   imageUrl     String?
-  departmentId String?
+  department   Department
   position     String?
   joinedAt     DateTime?
   isActive     Boolean    @default(true)
@@ -67,20 +67,10 @@ model User {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  department    Department?     @relation(fields: [departmentId], references: [id], onDelete: Restrict)
   checkIns      CheckIn[]
   leaves        Leave[]
 
   @@index([role])
-  @@index([departmentId])
-}
-
-model Department {
-  id        String         @id @default(cuid())
-  name      DepartmentName @unique
-  createdAt DateTime       @default(now())
-
-  users User[]
 }
 
 model CheckIn {

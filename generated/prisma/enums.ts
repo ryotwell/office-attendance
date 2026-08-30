@@ -47,7 +47,7 @@ export const LeaveStatus = {
 export type LeaveStatus = (typeof LeaveStatus)[keyof typeof LeaveStatus]
 
 
-export const DepartmentName = {
+export const Department = {
   ENGINEERING: 'ENGINEERING',
   OPERATIONS: 'OPERATIONS',
   SALES: 'SALES',
@@ -56,7 +56,7 @@ export const DepartmentName = {
   MARKETING: 'MARKETING'
 } as const
 
-export type DepartmentName = (typeof DepartmentName)[keyof typeof DepartmentName]
+export type Department = (typeof Department)[keyof typeof Department]
 
 
 export const Shift = {

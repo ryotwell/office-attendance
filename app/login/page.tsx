@@ -1,18 +1,12 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useState } from "react"
 import Image from "next/image"
-import { LockKeyhole, UserRound, LogIn, ShieldCheck } from "lucide-react"
+import { ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react"
 
 import { loginAction } from "@/app/actions/auth"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Field,
   FieldError,
@@ -23,92 +17,126 @@ import { Input } from "@/components/ui/input"
 
 export default function LoginPage() {
   const [error, formAction, isPending] = useActionState(loginAction, null)
+  const [showPassword, setShowPassword] = useState(false)
 
   return (
-    <main className="relative flex min-h-svh items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100 p-5">
-      <div className="absolute -left-32 -top-32 h-80 w-80 rounded-full bg-blue-200/40 blur-3xl" />
-      <div className="absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-green-200/40 blur-3xl" />
-
-      <Card className="relative w-full max-w-md rounded-3xl border-none bg-white/90 shadow-xl backdrop-blur">
-        <CardHeader className="space-y-5 text-center">
-          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-blue-50 shadow-inner">
-            <Image src="/assets/logo.png" alt="Logo" width={70} height={70} className="object-contain" />
+    <main className="flex min-h-svh flex-col items-center justify-center bg-zinc-50/60 px-6 py-16">
+      <div className="w-full max-w-sm">
+        {/* Logo — fokus utama */}
+        <div className="mb-12 flex flex-col items-center gap-6">
+          <div className="relative flex h-32 w-32 items-center justify-center rounded-full border border-zinc-100">
+            <div className="absolute inset-3 rounded-full border border-zinc-100" />
+            <Image
+              src="/assets/logo.png"
+              alt="Satak"
+              width={100}
+              height={100}
+              className="relative object-contain"
+              priority
+            />
           </div>
 
-          <div>
-            <CardTitle className="text-2xl font-bold text-gray-800">
+          <div className="text-center">
+            <h1 className="text-xl font-semibold tracking-tight text-zinc-900">
               {process.env.NEXT_PUBLIC_APP_NAME}
-            </CardTitle>
-            <CardDescription className="mt-2 text-base">
-              Silakan masuk untuk melihat informasi Anda
-            </CardDescription>
+            </h1>
+            <p className="mt-1.5 text-sm text-zinc-500">
+              Masuk untuk melihat informasi kehadiran Anda
+            </p>
           </div>
-        </CardHeader>
+        </div>
 
-        <CardContent>
-          <form action={formAction} className="space-y-6">
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="username" className="text-base">
-                  Nama Pengguna
-                </FieldLabel>
-                <div className="relative">
-                  <UserRound className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+        {/* Form */}
+        <Card className="rounded-2xl border-zinc-100 shadow-sm">
+          <CardContent className="p-8">
+            <form action={formAction}>
+              <FieldGroup className="gap-5">
+                <Field>
+                  <FieldLabel
+                    htmlFor="username"
+                    className="text-xs font-bold uppercase tracking-wide text-zinc-500"
+                  >
+                    Nama pengguna
+                  </FieldLabel>
                   <Input
                     id="username"
                     name="username"
                     type="text"
                     autoComplete="username"
                     placeholder="Masukkan nama pengguna"
-                    className="h-14 rounded-xl pl-12 text-base"
+                    className="h-12 rounded-lg border-zinc-200 bg-transparent px-4 text-[15px] shadow-none placeholder:text-zinc-400 focus-visible:border-zinc-400 focus-visible:ring-0"
                     required
                   />
-                </div>
-              </Field>
+                </Field>
 
-              <Field>
-                <FieldLabel htmlFor="password" className="text-base">
-                  Kata Sandi
-                </FieldLabel>
-                <div className="relative">
-                  <LockKeyhole className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    placeholder="Masukkan kata sandi"
-                    className="h-14 rounded-xl pl-12 text-base"
-                    required
-                  />
-                </div>
-              </Field>
-            </FieldGroup>
+                <Field>
+                  <FieldLabel
+                    htmlFor="password"
+                    className="text-xs font-bold uppercase tracking-wide text-zinc-500"
+                  >
+                    Kata sandi
+                  </FieldLabel>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="current-password"
+                      placeholder="Masukkan kata sandi"
+                      className="h-12 rounded-lg border-zinc-200 bg-transparent px-4 pr-11 text-[15px] shadow-none placeholder:text-zinc-400 focus-visible:border-zinc-400 focus-visible:ring-0"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      aria-label={
+                        showPassword
+                          ? "Sembunyikan kata sandi"
+                          : "Tampilkan kata sandi"
+                      }
+                      className="absolute right-0 top-0 flex h-12 w-11 items-center justify-center text-zinc-400 transition-colors hover:text-zinc-600"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                </Field>
 
-            {error && <FieldError className="text-center">{error}</FieldError>}
+                {error && (
+                  <FieldError className="-mt-1 text-center text-sm">
+                    {error}
+                  </FieldError>
+                )}
 
-            <Button
-              type="submit"
-              disabled={isPending}
-              className="h-14 w-full gap-3 rounded-xl text-lg font-semibold shadow-md"
-            >
-              {isPending ? (
-                "Sedang masuk..."
-              ) : (
-                <>
-                  <LogIn className="h-5 w-5" />
-                  Masuk
-                </>
-              )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+                <Button
+                  type="submit"
+                  disabled={isPending}
+                  className="mt-2 h-12 w-full gap-2 rounded-lg bg-zinc-900 text-[15px] font-medium text-white shadow-none hover:bg-zinc-800"
+                >
+                  {isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Sedang masuk...
+                    </>
+                  ) : (
+                    <>
+                      Masuk
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              </FieldGroup>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
 
-      <footer className="absolute bottom-8 flex flex-col items-center gap-1 text-center text-sm text-muted-foreground">
-        <span className="font-medium">Satak Office Attendance</span>
-        <span>© {new Date().getFullYear()} Satak Saas</span>
-      </footer>
+      <p className="mt-16 text-xs text-zinc-400">
+        Satak Office Attendance · © {new Date().getFullYear()}
+      </p>
     </main>
   )
 }

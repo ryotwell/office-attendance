@@ -10,25 +10,19 @@ export default async function EmployeesPage() {
   const session = await auth()
   if (!session?.user || session.user.role === "EMPLOYEE") redirect("/scan")
 
-  const [employees, departments] = await Promise.all([
-    prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        username: true,
-        role: true,
-        departmentId: true,
-        position: true,
-        joinedAt: true,
-        department: { select: { name: true } },
-        shift: true
-      },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.department.findMany({ orderBy: { name: "asc" } }),
-  ])
+  const employees = await prisma.user.findMany({
+    select: {
+      id: true,
+      name: true,
+      username: true,
+      role: true,
+      department: true,
+      position: true,
+      joinedAt: true,
+      shift: true,
+    },
+    orderBy: { createdAt: "desc" },
+  })
 
-  return (
-    <EmployeesManager employees={employees} departments={departments} />
-  )
+  return <EmployeesManager employees={employees} />
 }

@@ -8,7 +8,7 @@ import { z } from "zod"
 import { prisma } from "@/lib/prisma"
 import {
   AttendanceStatus,
-  DepartmentName,
+  Department,
   LeaveStatus,
   LeaveType,
   Role,
@@ -29,15 +29,10 @@ const employeeSchema = z.object({
     .optional()
     .or(z.literal("")),
   role: z.nativeEnum(Role),
-  departmentId: z.string().trim().min(1, "Departemen wajib dipilih"),
+  department: z.nativeEnum(Department),
   position: z.string().trim().min(1, "Posisi wajib diisi"),
   joinedAt: isoDate,
   shift: z.nativeEnum(Shift),
-})
-
-const departmentSchema = z.object({
-  id: z.string().optional(),
-  name: z.nativeEnum(DepartmentName),
 })
 
 const leaveSchema = z.object({
@@ -85,7 +80,7 @@ export async function upsertEmployee(
   if (clash) return { error: "Username sudah digunakan" }
 
   const common = {
-    departmentId: d.departmentId,
+    department: d.department,
     position: d.position,
     joinedAt: new Date(d.joinedAt),
     shift: d.shift,
@@ -130,38 +125,6 @@ export async function deleteEmployee(id: string) {
     // masih ada relasi (check-in/cuti); abaikan agar halaman tidak crash
   }
   revalidatePath("/employees")
-}
-
-// -------------------------------------------------------------- Departments
-
-export async function upsertDepartment(
-  _prev: ActionResult,
-  formData: FormData
-): Promise<ActionResult> {
-  const d = departmentSchema.safeParse(parse(formData))
-  if (!d.success) return { error: d.error.issues[0]?.message ?? "Data tidak valid" }
-  if (d.data.id) {
-    await prisma.department.update({
-      where: { id: d.data.id },
-      data: { name: d.data.name },
-    })
-  } else {
-    try {
-      await prisma.department.create({ data: { name: d.data.name } })
-    } catch {
-      return { error: "Nama departemen sudah ada" }
-    }
-  }
-  listPath("/departments")
-}
-
-export async function deleteDepartment(id: string) {
-  try {
-    await prisma.department.delete({ where: { id } })
-  } catch {
-    // masih dipakai employee; abaikan agar tidak crash
-  }
-  revalidatePath("/departments")
 }
 
 // -------------------------------------------------------------------- Leave
@@ -440,7 +403,7 @@ export async function getTodayAttendance(): Promise<TodayAttendanceRow[]> {
         select: {
           name: true,
           imageUrl: true,
-          department: { select: { name: true } },
+          department: true,
         },
       },
     },
@@ -452,7 +415,7 @@ export async function getTodayAttendance(): Promise<TodayAttendanceRow[]> {
     id: c.id,
     name: c.user.name,
     imageUrl: c.user.imageUrl,
-    department: c.user.department?.name ?? null,
+    department: c.user.department ?? null,
     clockIn: c.clockIn,
     clockOut: c.clockOut,
     status: c.status,

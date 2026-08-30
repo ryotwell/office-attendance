@@ -2,7 +2,7 @@ import { PrismaClient } from "../generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import bcrypt from "bcryptjs";
-import { DepartmentName, Role, Shift } from "../generated/prisma/enums";
+import { Department, Role, Shift } from "../generated/prisma/enums";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
@@ -10,14 +10,6 @@ const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 const PASSWORD = "admin123";
 
 async function main() {
-  // Departments
-  const departments = Object.values(DepartmentName);
-  for (const name of departments) {
-    await prisma.department.upsert({ where: { name }, update: {}, create: { name } });
-  }
-  const departmentRows = await prisma.department.findMany();
-  const departmentIdByName = Object.fromEntries(departmentRows.map((d) => [d.name, d.id]));
-
   // Wipe transactional data so re-running the seed is idempotent
   await prisma.leave.deleteMany({});
   await prisma.checkIn.deleteMany({});
@@ -29,7 +21,7 @@ async function main() {
       username: "ryotwell",
       role: Role.ADMIN,
       position: "Administrator",
-      department: DepartmentName.PEOPLE_OPS,
+      department: Department.PEOPLE_OPS,
       shift: Shift.FULLTIME,
     },
     {
@@ -37,7 +29,7 @@ async function main() {
       username: "karyawan_test",
       role: Role.EMPLOYEE,
       position: "Sales",
-      department: DepartmentName.SALES,
+      department: Department.SALES,
       shift: Shift.PAGI,
     },
   ];
@@ -61,6 +53,7 @@ async function main() {
         where: { username: u.username },
         update: {
           shift: u.shift,
+          department: u.department,
         },
         create: {
           name: u.name,
@@ -69,7 +62,7 @@ async function main() {
           role: u.role,
           position: u.position,
           joinedAt: new Date(),
-          departmentId: departmentIdByName[u.department],
+          department: u.department,
           shift: u.shift,
         },
       }),

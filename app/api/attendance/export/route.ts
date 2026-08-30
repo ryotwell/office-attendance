@@ -56,6 +56,12 @@ function duration(start: Date, end: Date | null) {
   return `${Math.floor(mins / 60)}j ${mins % 60}m`
 }
 
+// Department sekarang enum langsung di User (mis. "PEOPLE_OPS") — format
+// jadi label rapi ("People Ops") untuk laporan.
+function departmentLabel(name: string) {
+  return name.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
 // start..end is a half-open [start, end) UTC interval over the @db.Date column.
 function rangeBounds(dateStr: string | null, range: Range) {
   const base =
@@ -201,11 +207,7 @@ export async function GET(req: NextRequest) {
   const checkIns = await prisma.checkIn.findMany({
     where: { date: { gte: start, lt: end } },
     include: {
-      user: {
-        include: {
-          department: true,
-        },
-      },
+      user: true,
     },
     orderBy: [{ date: "asc" }, { user: { name: "asc" } }],
   })
@@ -214,7 +216,7 @@ export async function GET(req: NextRequest) {
     date: dateOf(c.date),
     day: dayOf(c.date),
     name: c.user.name,
-    department: c.user.department?.name ?? "-",
+    department: departmentLabel(c.user.department),
     // Tampilkan shift EFEKTIF hari itu (dari CheckIn), bukan User.shift
     // mentah — untuk pegawai rolling (PAGIATAUSIANG) ini menunjukkan
     // apakah hari itu dia masuk sesi Pagi atau Siang.

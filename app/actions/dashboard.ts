@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-import { AttendanceStatus } from "@/generated/prisma/enums"
+import { AttendanceStatus, Department } from "@/generated/prisma/enums"
 
 const DAY_LABELS = ["Sen", "Sel", "Rab", "Kam", "Jum"]
 
@@ -25,9 +25,7 @@ export type DashboardChartsData = {
   departments: { dept: string; employees: number; present: number }[]
 }
 
-export async function getDashboardCharts(): Promise<
-  DashboardChartsData | { error: string }
-> {
+export async function getDashboardCharts(): Promise<DashboardChartsData | { error: string }> {
   const session = await auth()
   if (!session?.user || session.user.role === "EMPLOYEE") {
     return { error: "Tidak diizinkan" }
@@ -38,24 +36,22 @@ export async function getDashboardCharts(): Promise<
   const today = utcDay(new Date())
   const todayEnd = new Date(today.getTime() + 86_400_000)
 
-  const [weekCheckIns, deptRows, todayCheckIns] = await Promise.all([
+  const [weekCheckIns, deptCounts, todayCheckIns] = await Promise.all([
     prisma.checkIn.findMany({
       where: { date: { gte: ws, lt: weekEnd } },
       select: { date: true, status: true },
     }),
-    prisma.department.findMany({
-      select: {
-        id: true,
-        name: true,
-        _count: { select: { users: { where: { isActive: true } } } },
-      },
+    prisma.user.groupBy({
+      by: ["department"],
+      where: { isActive: true },
+      _count: { _all: true },
     }),
     prisma.checkIn.findMany({
       where: {
         date: { gte: today, lt: todayEnd },
         status: { in: [AttendanceStatus.PRESENT, AttendanceStatus.LATE] },
       },
-      select: { user: { select: { departmentId: true } } },
+      select: { user: { select: { department: true } } },
     }),
   ])
 
@@ -74,17 +70,22 @@ export async function getDashboardCharts(): Promise<
     return { day, present: row?.present ?? 0, late: row?.late ?? 0, absent: row?.absent ?? 0 }
   })
 
-  const presentByDept = new Map<string, number>()
-  for (const c of todayCheckIns) {
-    const deptId = c.user.departmentId
-    if (deptId) presentByDept.set(deptId, (presentByDept.get(deptId) ?? 0) + 1)
+  const employeesByDept = new Map<Department, number>()
+  for (const row of deptCounts) {
+    employeesByDept.set(row.department, row._count._all)
   }
 
-  const departments = deptRows
+  const presentByDept = new Map<Department, number>()
+  for (const c of todayCheckIns) {
+    const dept = c.user.department
+    presentByDept.set(dept, (presentByDept.get(dept) ?? 0) + 1)
+  }
+
+  const departments = Object.values(Department)
     .map((d) => ({
-      dept: deptLabel(d.name),
-      employees: d._count.users,
-      present: presentByDept.get(d.id) ?? 0,
+      dept: deptLabel(d),
+      employees: employeesByDept.get(d) ?? 0,
+      present: presentByDept.get(d) ?? 0,
     }))
     .sort((a, b) => b.employees - a.employees)
 
