@@ -21,6 +21,7 @@ export default async function EmployeesPage() {
         position: true,
         joinedAt: true,
         department: { select: { name: true } },
+        shift: true
       },
       orderBy: { createdAt: "desc" },
     }),

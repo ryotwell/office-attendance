@@ -57,3 +57,12 @@ export const DepartmentName = {
 } as const
 
 export type DepartmentName = (typeof DepartmentName)[keyof typeof DepartmentName]
+
+
+export const Shift = {
+  PAGI: 'PAGI',
+  SIANG: 'SIANG',
+  FULLTIME: 'FULLTIME'
+} as const
+
+export type Shift = (typeof Shift)[keyof typeof Shift]

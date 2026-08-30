@@ -5,7 +5,7 @@ import { useActionState } from "react"
 import { Pencil, Plus, Trash2 } from "lucide-react"
 
 import { upsertEmployee, deleteEmployee } from "@/app/actions/admin"
-import { Role, type Role as RoleType } from "@/generated/prisma/enums"
+import { Role, Shift, type Role as RoleType, type Shift as ShiftType } from "@/generated/prisma/enums"
 import {
   FormField,
   FormSelect,
@@ -29,8 +29,25 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import shifts from '@/data/shift.json'
+
+type ShiftDetail = {
+  startTime: string
+  endTime: string
+}
 
 const roleOptions = Object.values(Role).map((v) => ({ value: v, label: v }))
+// const shiftOptions = Object.values(Shift).map((v) => ({ value: v, label: v }))
+const shiftData = shifts as Record<string, ShiftDetail>
+
+const shiftOptions = Object.values(Shift).map((v) => {
+  const shift = shiftData[v]
+
+  return {
+    value: v,
+    label: `${v} (${shift.startTime} - ${shift.endTime})`,
+  }
+})
 
 function toDateInput(value?: string | Date | null) {
   if (!value) return ""
@@ -55,6 +72,7 @@ export function EmployeesManager({
     joinedAt: Date | null
     departmentId: string | null
     department: { name: string } | null
+    shift: ShiftType
   }>
   departments: Array<{ id: string; name: string }>
 }) {
@@ -93,6 +111,7 @@ export function EmployeesManager({
                 <TableHead>Nama</TableHead>
                 <TableHead>Departemen</TableHead>
                 <TableHead>Posisi</TableHead>
+                <TableHead>Shift</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead className="text-right">Aksi</TableHead>
               </TableRow>
@@ -106,6 +125,7 @@ export function EmployeesManager({
                   </TableCell>
                   <TableCell>{emp.department?.name ?? "—"}</TableCell>
                   <TableCell>{emp.position}</TableCell>
+                  <TableCell className="text-muted-foreground">{emp.shift}</TableCell>
                   <TableCell className="text-muted-foreground">{emp.role}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
@@ -167,6 +187,13 @@ export function EmployeesManager({
                 required
                 defaultValue={editing?.departmentId ?? ""}
                 options={departments.map((d) => ({ value: d.id, label: d.name }))}
+              />
+              <FormSelect
+                label="Shift"
+                name="shift"
+                required
+                defaultValue={editing?.shift}
+                options={shiftOptions}
               />
               <FormField
                 label="Posisi"

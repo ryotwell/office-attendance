@@ -23,6 +23,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 const statusVariant: Record<string, "default" | "outline" | "secondary" | "destructive"> = {
   PRESENT: "default",
@@ -69,8 +71,13 @@ function Row({ row }: { row: TodayAttendanceRow }) {
       <TableCell className="tabular-nums">{timeLabel(row.clockOut)}</TableCell>
       <TableCell className="text-right">
         <Badge variant={statusVariant[row.status] ?? "secondary"}>
-          {statusLabel[row.status] ?? row.status}
+          {statusLabel[row.status] ?? row.status}a
         </Badge>
+        {row.status === "LATE" && row.lateMinutes > 0 ? (
+          <div className="mt-1 text-xs text-muted-foreground">
+            Telat {row.lateMinutes} menit
+          </div>
+        ) : null}
       </TableCell>
     </TableRow>
   )
@@ -78,6 +85,8 @@ function Row({ row }: { row: TodayAttendanceRow }) {
 
 export function AttendanceTable() {
   const [rows, setRows] = React.useState<TodayAttendanceRow[] | null>(null)
+
+  const router = useRouter()
 
   React.useEffect(() => {
     getTodayAttendance().then(setRows).catch(() => setRows([]))
@@ -90,7 +99,8 @@ export function AttendanceTable() {
           <CardTitle className="text-base">Kehadiran Hari Ini</CardTitle>
           <CardDescription>Check-in terbaru di seluruh kantor</CardDescription>
           <CardAction>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm"
+                  onClick={() => router.push("/attendances")}>
               Lihat semua
               <ArrowUpRight />
             </Button>

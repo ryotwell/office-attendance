@@ -12,6 +12,7 @@ import {
   LeaveStatus,
   LeaveType,
   Role,
+  Shift,
 } from "@/generated/prisma/enums"
 
 const isoDate = z.string().refine((v) => !Number.isNaN(Date.parse(v)), {
@@ -31,31 +32,12 @@ const employeeSchema = z.object({
   departmentId: z.string().trim().min(1, "Departemen wajib dipilih"),
   position: z.string().trim().min(1, "Posisi wajib diisi"),
   joinedAt: isoDate,
+  shift: z.nativeEnum(Shift),
 })
 
 const departmentSchema = z.object({
   id: z.string().optional(),
   name: z.nativeEnum(DepartmentName),
-})
-
-const shiftSchema = z.object({
-  id: z.string().optional(),
-  name: z.string().trim().min(1, "Nama shift wajib diisi"),
-  startTime: z
-    .string()
-    .regex(/^\d{2}:\d{2}$/, "Format HH:MM")
-    .refine((v) => Number(v.slice(0, 2)) < 24 && Number(v.slice(3)) < 60),
-  endTime: z
-    .string()
-    .regex(/^\d{2}:\d{2}$/, "Format HH:MM")
-    .refine((v) => Number(v.slice(0, 2)) < 24 && Number(v.slice(3)) < 60),
-  graceMinutes: z.coerce.number().int().min(0).max(120),
-})
-
-const scheduleSchema = z.object({
-  id: z.string().optional(),
-  userId: z.string().trim().min(1, "Karyawan wajib dipilih"),
-  shiftId: z.string().trim().min(1, "Shift wajib dipilih"),
 })
 
 const leaveSchema = z.object({
@@ -106,6 +88,7 @@ export async function upsertEmployee(
     departmentId: d.departmentId,
     position: d.position,
     joinedAt: new Date(d.joinedAt),
+    shift: d.shift,
   }
 
   if (d.id) {
@@ -144,7 +127,7 @@ export async function deleteEmployee(id: string) {
   try {
     await prisma.user.delete({ where: { id } })
   } catch {
-    // masih ada relasi (check-in/jadwal/cuti); abaikan agar halaman tidak crash
+    // masih ada relasi (check-in/cuti); abaikan agar halaman tidak crash
   }
   revalidatePath("/employees")
 }
@@ -179,79 +162,6 @@ export async function deleteDepartment(id: string) {
     // masih dipakai employee; abaikan agar tidak crash
   }
   revalidatePath("/departments")
-}
-
-// ------------------------------------------------------------------- Shifts
-
-export async function upsertShift(
-  _prev: ActionResult,
-  formData: FormData
-): Promise<ActionResult> {
-  const d = shiftSchema.safeParse(parse(formData))
-  if (!d.success) return { error: d.error.issues[0]?.message ?? "Data tidak valid" }
-  if (d.data.id) {
-    await prisma.shift.update({
-      where: { id: d.data.id },
-      data: {
-        name: d.data.name,
-        startTime: d.data.startTime,
-        endTime: d.data.endTime,
-        graceMinutes: d.data.graceMinutes,
-      },
-    })
-  } else {
-    try {
-      await prisma.shift.create({
-        data: {
-          name: d.data.name,
-          startTime: d.data.startTime,
-          endTime: d.data.endTime,
-          graceMinutes: d.data.graceMinutes,
-        },
-      })
-    } catch {
-      return { error: "Nama shift sudah ada" }
-    }
-  }
-  listPath("/shifts")
-}
-
-export async function deleteShift(id: string) {
-  await prisma.shift.deleteMany({
-    where: { id, workSchedules: { none: {} } },
-  })
-  revalidatePath("/shifts")
-}
-
-// ---------------------------------------------------------------- Schedules
-
-export async function upsertSchedule(
-  _prev: ActionResult,
-  formData: FormData
-): Promise<ActionResult> {
-  const data = scheduleSchema.safeParse(parse(formData))
-  if (!data.success) return { error: data.error.issues[0]?.message ?? "Data tidak valid" }
-  const d = data.data
-  try {
-    if (d.id) {
-      await prisma.workSchedule.update({
-        where: { id: d.id },
-        data: { userId: d.userId, shiftId: d.shiftId },
-      })
-    } else {
-      await prisma.workSchedule.create({
-        data: { userId: d.userId, shiftId: d.shiftId },
-      })
-    }
-  } catch {
-    return { error: "Karyawan sudah memiliki jadwal" }
-  }
-  listPath("/schedules")
-}
-
-export async function deleteSchedule(id: string) {
-  await prisma.workSchedule.delete({ where: { id } })
-  revalidatePath("/schedules")
 }
 
 // -------------------------------------------------------------------- Leave
@@ -465,8 +375,6 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   const today = dayStartUTC()
   const todayEnd = dayStartUTC(new Date(now + 86_400_000))
 
-  console.log({ today });
-
   const [totalEmployees, todayCheckIns, todayLeaves] = await Promise.all([
     prisma.user.count({ where: { isActive: true } }),
     prisma.checkIn.findMany({
@@ -482,9 +390,6 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       select: { type: true },
     }),
   ])
-
-  console.log({todayCheckIns});
-  
 
   const present = todayCheckIns.filter(
     (c) => c.status === "PRESENT" || c.status === "LATE"
@@ -512,6 +417,7 @@ export type TodayAttendanceRow = {
   clockIn: Date | null
   clockOut: Date | null
   status: string
+  lateMinutes: number
 }
 
 // Today's check-ins for the dashboard table. Called client-side.
@@ -527,6 +433,7 @@ export async function getTodayAttendance(): Promise<TodayAttendanceRow[]> {
       clockIn: true,
       clockOut: true,
       status: true,
+      lateMinutes: true,
       user: {
         select: {
           name: true,
@@ -547,5 +454,6 @@ export async function getTodayAttendance(): Promise<TodayAttendanceRow[]> {
     clockIn: c.clockIn,
     clockOut: c.clockOut,
     status: c.status,
+    lateMinutes: c.lateMinutes,
   }))
 }

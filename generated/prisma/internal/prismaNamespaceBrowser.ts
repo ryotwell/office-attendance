@@ -53,8 +53,6 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Department: 'Department',
-  Shift: 'Shift',
-  WorkSchedule: 'WorkSchedule',
   CheckIn: 'CheckIn',
   Leave: 'Leave'
 } as const
@@ -86,6 +84,7 @@ export const UserScalarFieldEnum = {
   position: 'position',
   joinedAt: 'joinedAt',
   isActive: 'isActive',
+  shift: 'shift',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -100,28 +99,6 @@ export const DepartmentScalarFieldEnum = {
 } as const
 
 export type DepartmentScalarFieldEnum = (typeof DepartmentScalarFieldEnum)[keyof typeof DepartmentScalarFieldEnum]
-
-
-export const ShiftScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  startTime: 'startTime',
-  endTime: 'endTime',
-  graceMinutes: 'graceMinutes',
-  createdAt: 'createdAt'
-} as const
-
-export type ShiftScalarFieldEnum = (typeof ShiftScalarFieldEnum)[keyof typeof ShiftScalarFieldEnum]
-
-
-export const WorkScheduleScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  shiftId: 'shiftId',
-  createdAt: 'createdAt'
-} as const
-
-export type WorkScheduleScalarFieldEnum = (typeof WorkScheduleScalarFieldEnum)[keyof typeof WorkScheduleScalarFieldEnum]
 
 
 export const CheckInScalarFieldEnum = {

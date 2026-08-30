@@ -44,6 +44,12 @@ enum DepartmentName {
   MARKETING
 }
 
+enum Shift {
+  PAGI
+  SIANG
+  FULLTIME
+}
+
 model User {
   id           String     @id @default(cuid())
   name         String
@@ -55,11 +61,12 @@ model User {
   position     String?
   joinedAt     DateTime?
   isActive     Boolean    @default(true)
+  shift        Shift
+
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
   department    Department?     @relation(fields: [departmentId], references: [id], onDelete: Restrict)
-  workSchedules WorkSchedule[]
   checkIns      CheckIn[]
   leaves        Leave[]
 
@@ -73,29 +80,6 @@ model Department {
   createdAt DateTime       @default(now())
 
   users User[]
-}
-
-model Shift {
-  id           String   @id @default(cuid())
-  name         String   @unique
-  startTime    String // "08:00"
-  endTime      String // "17:00"
-  graceMinutes Int      @default(0)
-  createdAt    DateTime @default(now())
-
-  workSchedules WorkSchedule[]
-}
-
-model WorkSchedule {
-  id        String   @id @default(cuid())
-  userId    String
-  shiftId   String
-  createdAt DateTime @default(now())
-
-  user  User   @relation(fields: [userId], references: [id])
-  shift Shift  @relation(fields: [shiftId], references: [id])
-
-  @@unique([userId])
 }
 
 model CheckIn {

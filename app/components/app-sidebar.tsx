@@ -81,16 +81,6 @@ function navMain(month: string) {
       ],
     },
     {
-      title: "Jadwal",
-      url: "/schedules",
-      icon: CalendarClock,
-    },
-    {
-      title: "Shift",
-      url: "/shifts",
-      icon: Clock,
-    },
-    {
       title: "Cuti",
       url: "/leave",
       icon: CalendarDays,

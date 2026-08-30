@@ -1,0 +1,14 @@
+{
+  "PAGI": {
+    "startTime": "08:30",
+    "endTime": "17:00"
+  },
+  "SIANG": {
+    "startTime": "17:00",
+    "endTime": "22:00"
+  },
+  "FULLTIME": {
+    "startTime": "08:30",
+    "endTime": "22:00"
+  }
+}

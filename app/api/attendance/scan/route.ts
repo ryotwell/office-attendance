@@ -3,8 +3,14 @@ import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { isWithinOfficeRadius, OFFICE_RADIUS_METERS } from "@/lib/geo"
+import shiftHours from "@/data/shift.json"
 
 const QR_CODE_KEY = process.env.ATTEDANCE_QRCODE_KEY
+
+// Toleransi keterlambatan (menit) sebelum status berubah dari PRESENT ke LATE.
+// Dulu per-shift lewat WorkSchedule.shift.graceMinutes; sekarang shift cuma
+// enum statis (lihat data/shift.json), jadi grace-nya juga dibuat global.
+const GRACE_MINUTES = 30
 
 // POST /api/attendance/scan  { token, latitude, longitude }
 // Employee self-scan: QR is a static code physically posted at the office
@@ -14,8 +20,7 @@ const QR_CODE_KEY = process.env.ATTEDANCE_QRCODE_KEY
 // in lib/geo.ts — this is what actually enforces "must be physically at the
 // office", not the QR token match.
 // First scan of a day clocks in; a later scan clocks out. Attendance works
-// every day except Sunday (no WorkSchedule check per day — a schedule
-// applies daily).
+// every day (shift enum applies daily, no per-day schedule row anymore).
 // Clock-in is rejected before shift.startTime and after shift.endTime.
 // Clock-out is rejected before shift.endTime (no early clock-out).
 // Shift start (+grace) decides PRESENT/LATE.
@@ -65,6 +70,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Akun tidak ditemukan" }, { status: 404 })
   }
 
+  // Shift sekarang enum langsung di User, jam kerjanya di-lookup dari
+  // data/shift.json (statis, sama untuk semua user dengan shift yang sama).
+  const shift = shiftHours[user.shift]
+  if (!shift) {
+    return NextResponse.json(
+      { error: "Jadwal kerja belum diatur" },
+      { status: 409 }
+    )
+  }
+
   const now = new Date()
 
   // "Hari ini" sebagai kunci tanggal, disimpan sebagai UTC midnight dari
@@ -82,30 +97,17 @@ export async function POST(req: Request) {
   //   return NextResponse.json({ error: "Hari Minggu libur" }, { status: 409 })
   // }
 
-  // Absensi membutuhkan WorkSchedule untuk user ini. Satu schedule bersifat
-  // unik per user dan berlaku untuk setiap hari kerja.
-  const schedule = await prisma.workSchedule.findUnique({
-    where: { userId: user.id },
-    include: { shift: true },
-  })
-  if (!schedule) {
-    return NextResponse.json(
-      { error: "Jadwal kerja belum diatur" },
-      { status: 409 }
-    )
-  }
-
   // start = startTime shift hari ini, dihitung dalam local time (TZ proses)
   // karena langsung dibandingkan dengan `now`. Clock-in harus terjadi
   // pada/setelah waktu ini.
-  const [sh, sm] = schedule.shift.startTime.split(":").map(Number)
+  const [sh, sm] = shift.startTime.split(":").map(Number)
   const start = new Date(now)
   start.setHours(sh, sm, 0, 0)
 
   // end = endTime shift hari ini, basis local time yang sama dengan `start`.
   // Clock-in harus terjadi sebelum ini; clock-out hanya boleh setelah ini
   // (tidak boleh pulang sebelum shift selesai).
-  const [eh, em] = schedule.shift.endTime.split(":").map(Number)
+  const [eh, em] = shift.endTime.split(":").map(Number)
   const end = new Date(now)
   end.setHours(eh, em, 0, 0)
   if (eh === 0 && em === 0) end.setDate(end.getDate() + 1) // endTime "00:00" → tengah malam nanti malam
@@ -125,7 +127,7 @@ export async function POST(req: Request) {
     // Tidak boleh clock out sebelum shift selesai.
     if (now < end) {
       return NextResponse.json(
-        { error: `Shift belum selesai (berakhir jam ${schedule.shift.endTime})` },
+        { error: `Shift belum selesai (berakhir jam ${shift.endTime})` },
         { status: 409 }
       )
     }
@@ -143,9 +145,9 @@ export async function POST(req: Request) {
       status: updated.status,
       lateMinutes: updated.lateMinutes,
       schedule: {
-        shift: schedule.shift.name,
-        startTime: schedule.shift.startTime,
-        endTime: schedule.shift.endTime,
+        shift: user.shift,
+        startTime: shift.startTime,
+        endTime: shift.endTime,
       },
     })
   }
@@ -155,7 +157,7 @@ export async function POST(req: Request) {
   // Tidak boleh clock in sebelum shift mulai.
   if (now < start) {
     return NextResponse.json(
-      { error: `Shift belum mulai (mulai jam ${schedule.shift.startTime})` },
+      { error: `Shift belum mulai (mulai jam ${shift.startTime})` },
       { status: 409 }
     )
   }
@@ -168,7 +170,7 @@ export async function POST(req: Request) {
   }
 
   // Keterlambatan: setelah (waktu mulai shift + menit toleransi).
-  const graceEnd = new Date(start.getTime() + schedule.shift.graceMinutes * 60_000)
+  const graceEnd = new Date(start.getTime() + GRACE_MINUTES * 60_000)
 
   let status: "PRESENT" | "LATE" = "PRESENT"
   let lateMinutes = 0
@@ -195,9 +197,9 @@ export async function POST(req: Request) {
     status: checkIn.status,
     lateMinutes: checkIn.lateMinutes,
     schedule: {
-      shift: schedule.shift.name,
-      startTime: schedule.shift.startTime,
-      endTime: schedule.shift.endTime,
+      shift: user.shift,
+      startTime: shift.startTime,
+      endTime: shift.endTime,
     },
   })
 }

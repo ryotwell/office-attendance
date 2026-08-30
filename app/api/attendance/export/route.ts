@@ -19,7 +19,18 @@ const STATUS_LABEL: Record<string, string> = {
   ON_LEAVE: "Cuti",
 }
 
+const DAY_LABEL = [
+  "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu",
+]
+
 const dateOf = (dt: Date) => dt.toISOString().slice(0, 10)
+
+// Nama hari dari kolom @db.Date, dibaca sebagai komponen UTC karena
+// CheckIn.date disimpan sebagai UTC midnight dari hari kalender lokal.
+function dayOf(dt: Date) {
+  const d = new Date(dt)
+  return DAY_LABEL[d.getUTCDay()]
+}
 
 function timeOf(dt: Date | null) {
   if (!dt) return "-"
@@ -80,6 +91,7 @@ function fileName(range: Range, start: Date, end: Date, format: Format) {
 
 type Row = {
   date: string
+  day: string
   name: string
   department: string
   shift: string
@@ -93,6 +105,7 @@ type Row = {
 
 const HEADERS = [
   "Tanggal",
+  "Hari",
   "Nama",
   "Departemen",
   "Shift",
@@ -114,11 +127,14 @@ async function xlsxResponse(title: string, rows: Row[], filename: string) {
   ws.addRow(HEADERS)
   ws.getRow(2).font = { bold: true }
   rows.forEach((r) =>
-    ws.addRow([r.date, r.name, r.department, r.shift, r.clockIn, r.clockOut, r.duration, r.status, r.late, r.notes])
+    ws.addRow([
+      r.date, r.day, r.name, r.department, r.shift,
+      r.clockIn, r.clockOut, r.duration, r.status, r.late, r.notes,
+    ])
   )
 
   ws.columns = [
-    { width: 12 }, { width: 24 }, { width: 18 }, { width: 12 },
+    { width: 12 }, { width: 10 }, { width: 24 }, { width: 18 }, { width: 12 },
     { width: 10 }, { width: 10 }, { width: 12 }, { width: 14 }, { width: 16 }, { width: 24 },
   ]
   ws.views = [{ state: "frozen", ySplit: 2 }]
@@ -142,7 +158,7 @@ async function pdfResponse(title: string, rows: Row[], filename: string) {
     startY: 20,
     head: [HEADERS],
     body: rows.map((r) => [
-      r.date, r.name, r.department, r.shift, r.clockIn, r.clockOut,
+      r.date, r.day, r.name, r.department, r.shift, r.clockIn, r.clockOut,
       r.duration, r.status, r.late, r.notes,
     ]),
     styles: { fontSize: 8, cellPadding: 1.5 },
@@ -180,7 +196,6 @@ export async function GET(req: NextRequest) {
       user: {
         include: {
           department: true,
-          workSchedules: { include: { shift: true } },
         },
       },
     },
@@ -189,9 +204,10 @@ export async function GET(req: NextRequest) {
 
   const rows: Row[] = checkIns.map((c) => ({
     date: dateOf(c.date),
+    day: dayOf(c.date),
     name: c.user.name,
     department: c.user.department?.name ?? "-",
-    shift: c.user.workSchedules[0]?.shift.name ?? "-",
+    shift: c.user.shift,
     clockIn: timeOf(c.clockIn),
     clockOut: timeOf(c.clockOut),
     duration: duration(c.clockIn, c.clockOut),

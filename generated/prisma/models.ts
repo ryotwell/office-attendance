@@ -10,8 +10,6 @@
  */
 export type * from './models/User'
 export type * from './models/Department'
-export type * from './models/Shift'
-export type * from './models/WorkSchedule'
 export type * from './models/CheckIn'
 export type * from './models/Leave'
 export type * from './commonInputTypes'

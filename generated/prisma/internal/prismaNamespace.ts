@@ -399,8 +399,6 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   Department: 'Department',
-  Shift: 'Shift',
-  WorkSchedule: 'WorkSchedule',
   CheckIn: 'CheckIn',
   Leave: 'Leave'
 } as const
@@ -418,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "department" | "shift" | "workSchedule" | "checkIn" | "leave"
+    modelProps: "user" | "department" | "checkIn" | "leave"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -567,154 +565,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.DepartmentCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.DepartmentCountAggregateOutputType> | number
-        }
-      }
-    }
-    Shift: {
-      payload: Prisma.$ShiftPayload<ExtArgs>
-      fields: Prisma.ShiftFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.ShiftFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShiftPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.ShiftFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShiftPayload>
-        }
-        findFirst: {
-          args: Prisma.ShiftFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShiftPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.ShiftFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShiftPayload>
-        }
-        findMany: {
-          args: Prisma.ShiftFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShiftPayload>[]
-        }
-        create: {
-          args: Prisma.ShiftCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShiftPayload>
-        }
-        createMany: {
-          args: Prisma.ShiftCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.ShiftCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShiftPayload>[]
-        }
-        delete: {
-          args: Prisma.ShiftDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShiftPayload>
-        }
-        update: {
-          args: Prisma.ShiftUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShiftPayload>
-        }
-        deleteMany: {
-          args: Prisma.ShiftDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.ShiftUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.ShiftUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShiftPayload>[]
-        }
-        upsert: {
-          args: Prisma.ShiftUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShiftPayload>
-        }
-        aggregate: {
-          args: Prisma.ShiftAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateShift>
-        }
-        groupBy: {
-          args: Prisma.ShiftGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.ShiftGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.ShiftCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.ShiftCountAggregateOutputType> | number
-        }
-      }
-    }
-    WorkSchedule: {
-      payload: Prisma.$WorkSchedulePayload<ExtArgs>
-      fields: Prisma.WorkScheduleFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.WorkScheduleFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.WorkScheduleFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>
-        }
-        findFirst: {
-          args: Prisma.WorkScheduleFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.WorkScheduleFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>
-        }
-        findMany: {
-          args: Prisma.WorkScheduleFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>[]
-        }
-        create: {
-          args: Prisma.WorkScheduleCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>
-        }
-        createMany: {
-          args: Prisma.WorkScheduleCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.WorkScheduleCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>[]
-        }
-        delete: {
-          args: Prisma.WorkScheduleDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>
-        }
-        update: {
-          args: Prisma.WorkScheduleUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>
-        }
-        deleteMany: {
-          args: Prisma.WorkScheduleDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.WorkScheduleUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.WorkScheduleUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>[]
-        }
-        upsert: {
-          args: Prisma.WorkScheduleUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>
-        }
-        aggregate: {
-          args: Prisma.WorkScheduleAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateWorkSchedule>
-        }
-        groupBy: {
-          args: Prisma.WorkScheduleGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.WorkScheduleGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.WorkScheduleCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.WorkScheduleCountAggregateOutputType> | number
         }
       }
     }
@@ -916,6 +766,7 @@ export const UserScalarFieldEnum = {
   position: 'position',
   joinedAt: 'joinedAt',
   isActive: 'isActive',
+  shift: 'shift',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -930,28 +781,6 @@ export const DepartmentScalarFieldEnum = {
 } as const
 
 export type DepartmentScalarFieldEnum = (typeof DepartmentScalarFieldEnum)[keyof typeof DepartmentScalarFieldEnum]
-
-
-export const ShiftScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  startTime: 'startTime',
-  endTime: 'endTime',
-  graceMinutes: 'graceMinutes',
-  createdAt: 'createdAt'
-} as const
-
-export type ShiftScalarFieldEnum = (typeof ShiftScalarFieldEnum)[keyof typeof ShiftScalarFieldEnum]
-
-
-export const WorkScheduleScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  shiftId: 'shiftId',
-  createdAt: 'createdAt'
-} as const
-
-export type WorkScheduleScalarFieldEnum = (typeof WorkScheduleScalarFieldEnum)[keyof typeof WorkScheduleScalarFieldEnum]
 
 
 export const CheckInScalarFieldEnum = {
@@ -1067,6 +896,20 @@ export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'Shift'
+ */
+export type EnumShiftFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Shift'>
+    
+
+
+/**
+ * Reference to a field of type 'Shift[]'
+ */
+export type ListEnumShiftFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Shift[]'>
+    
+
+
+/**
  * Reference to a field of type 'DepartmentName'
  */
 export type EnumDepartmentNameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DepartmentName'>
@@ -1081,20 +924,6 @@ export type ListEnumDepartmentNameFieldRefInput<$PrismaModel> = FieldRefInputTyp
 
 
 /**
- * Reference to a field of type 'Int'
- */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-/**
- * Reference to a field of type 'Int[]'
- */
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-/**
  * Reference to a field of type 'AttendanceStatus'
  */
 export type EnumAttendanceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AttendanceStatus'>
@@ -1105,6 +934,20 @@ export type EnumAttendanceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<
  * Reference to a field of type 'AttendanceStatus[]'
  */
 export type ListEnumAttendanceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AttendanceStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Int[]'
+ */
+export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
@@ -1302,8 +1145,6 @@ export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaC
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   department?: Prisma.DepartmentOmit
-  shift?: Prisma.ShiftOmit
-  workSchedule?: Prisma.WorkScheduleOmit
   checkIn?: Prisma.CheckInOmit
   leave?: Prisma.LeaveOmit
 }

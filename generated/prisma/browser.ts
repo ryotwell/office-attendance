@@ -28,16 +28,6 @@ export type User = Prisma.UserModel
  */
 export type Department = Prisma.DepartmentModel
 /**
- * Model Shift
- * 
- */
-export type Shift = Prisma.ShiftModel
-/**
- * Model WorkSchedule
- * 
- */
-export type WorkSchedule = Prisma.WorkScheduleModel
-/**
  * Model CheckIn
  * 
  */

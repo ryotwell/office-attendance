@@ -35,6 +35,7 @@ export type UserMinAggregateOutputType = {
   position: string | null
   joinedAt: Date | null
   isActive: boolean | null
+  shift: $Enums.Shift | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -50,6 +51,7 @@ export type UserMaxAggregateOutputType = {
   position: string | null
   joinedAt: Date | null
   isActive: boolean | null
+  shift: $Enums.Shift | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -65,6 +67,7 @@ export type UserCountAggregateOutputType = {
   position: number
   joinedAt: number
   isActive: number
+  shift: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -82,6 +85,7 @@ export type UserMinAggregateInputType = {
   position?: true
   joinedAt?: true
   isActive?: true
+  shift?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -97,6 +101,7 @@ export type UserMaxAggregateInputType = {
   position?: true
   joinedAt?: true
   isActive?: true
+  shift?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -112,6 +117,7 @@ export type UserCountAggregateInputType = {
   position?: true
   joinedAt?: true
   isActive?: true
+  shift?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -200,6 +206,7 @@ export type UserGroupByOutputType = {
   position: string | null
   joinedAt: Date | null
   isActive: boolean
+  shift: $Enums.Shift
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
@@ -236,10 +243,10 @@ export type UserWhereInput = {
   position?: Prisma.StringNullableFilter<"User"> | string | null
   joinedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   isActive?: Prisma.BoolFilter<"User"> | boolean
+  shift?: Prisma.EnumShiftFilter<"User"> | $Enums.Shift
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   department?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null
-  workSchedules?: Prisma.WorkScheduleListRelationFilter
   checkIns?: Prisma.CheckInListRelationFilter
   leaves?: Prisma.LeaveListRelationFilter
 }
@@ -255,10 +262,10 @@ export type UserOrderByWithRelationInput = {
   position?: Prisma.SortOrderInput | Prisma.SortOrder
   joinedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  shift?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   department?: Prisma.DepartmentOrderByWithRelationInput
-  workSchedules?: Prisma.WorkScheduleOrderByRelationAggregateInput
   checkIns?: Prisma.CheckInOrderByRelationAggregateInput
   leaves?: Prisma.LeaveOrderByRelationAggregateInput
 }
@@ -277,10 +284,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   position?: Prisma.StringNullableFilter<"User"> | string | null
   joinedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   isActive?: Prisma.BoolFilter<"User"> | boolean
+  shift?: Prisma.EnumShiftFilter<"User"> | $Enums.Shift
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   department?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null
-  workSchedules?: Prisma.WorkScheduleListRelationFilter
   checkIns?: Prisma.CheckInListRelationFilter
   leaves?: Prisma.LeaveListRelationFilter
 }, "id" | "username">
@@ -296,6 +303,7 @@ export type UserOrderByWithAggregationInput = {
   position?: Prisma.SortOrderInput | Prisma.SortOrder
   joinedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  shift?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -317,6 +325,7 @@ export type UserScalarWhereWithAggregatesInput = {
   position?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   joinedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   isActive?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  shift?: Prisma.EnumShiftWithAggregatesFilter<"User"> | $Enums.Shift
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -331,10 +340,10 @@ export type UserCreateInput = {
   position?: string | null
   joinedAt?: Date | string | null
   isActive?: boolean
+  shift: $Enums.Shift
   createdAt?: Date | string
   updatedAt?: Date | string
   department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
-  workSchedules?: Prisma.WorkScheduleCreateNestedManyWithoutUserInput
   checkIns?: Prisma.CheckInCreateNestedManyWithoutUserInput
   leaves?: Prisma.LeaveCreateNestedManyWithoutUserInput
 }
@@ -350,9 +359,9 @@ export type UserUncheckedCreateInput = {
   position?: string | null
   joinedAt?: Date | string | null
   isActive?: boolean
+  shift: $Enums.Shift
   createdAt?: Date | string
   updatedAt?: Date | string
-  workSchedules?: Prisma.WorkScheduleUncheckedCreateNestedManyWithoutUserInput
   checkIns?: Prisma.CheckInUncheckedCreateNestedManyWithoutUserInput
   leaves?: Prisma.LeaveUncheckedCreateNestedManyWithoutUserInput
 }
@@ -367,10 +376,10 @@ export type UserUpdateInput = {
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
-  workSchedules?: Prisma.WorkScheduleUpdateManyWithoutUserNestedInput
   checkIns?: Prisma.CheckInUpdateManyWithoutUserNestedInput
   leaves?: Prisma.LeaveUpdateManyWithoutUserNestedInput
 }
@@ -386,9 +395,9 @@ export type UserUncheckedUpdateInput = {
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  workSchedules?: Prisma.WorkScheduleUncheckedUpdateManyWithoutUserNestedInput
   checkIns?: Prisma.CheckInUncheckedUpdateManyWithoutUserNestedInput
   leaves?: Prisma.LeaveUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -404,6 +413,7 @@ export type UserCreateManyInput = {
   position?: string | null
   joinedAt?: Date | string | null
   isActive?: boolean
+  shift: $Enums.Shift
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -418,6 +428,7 @@ export type UserUpdateManyMutationInput = {
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -433,6 +444,7 @@ export type UserUncheckedUpdateManyInput = {
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -448,6 +460,7 @@ export type UserCountOrderByAggregateInput = {
   position?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  shift?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -463,6 +476,7 @@ export type UserMaxOrderByAggregateInput = {
   position?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  shift?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -478,6 +492,7 @@ export type UserMinOrderByAggregateInput = {
   position?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  shift?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -515,6 +530,10 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
 
 export type BoolFieldUpdateOperationsInput = {
   set?: boolean
+}
+
+export type EnumShiftFieldUpdateOperationsInput = {
+  set?: $Enums.Shift
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -563,20 +582,6 @@ export type UserUncheckedUpdateManyWithoutDepartmentNestedInput = {
   deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
 }
 
-export type UserCreateNestedOneWithoutWorkSchedulesInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutWorkSchedulesInput, Prisma.UserUncheckedCreateWithoutWorkSchedulesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWorkSchedulesInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserUpdateOneRequiredWithoutWorkSchedulesNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutWorkSchedulesInput, Prisma.UserUncheckedCreateWithoutWorkSchedulesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWorkSchedulesInput
-  upsert?: Prisma.UserUpsertWithoutWorkSchedulesInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutWorkSchedulesInput, Prisma.UserUpdateWithoutWorkSchedulesInput>, Prisma.UserUncheckedUpdateWithoutWorkSchedulesInput>
-}
-
 export type UserCreateNestedOneWithoutCheckInsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutCheckInsInput, Prisma.UserUncheckedCreateWithoutCheckInsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutCheckInsInput
@@ -615,9 +620,9 @@ export type UserCreateWithoutDepartmentInput = {
   position?: string | null
   joinedAt?: Date | string | null
   isActive?: boolean
+  shift: $Enums.Shift
   createdAt?: Date | string
   updatedAt?: Date | string
-  workSchedules?: Prisma.WorkScheduleCreateNestedManyWithoutUserInput
   checkIns?: Prisma.CheckInCreateNestedManyWithoutUserInput
   leaves?: Prisma.LeaveCreateNestedManyWithoutUserInput
 }
@@ -632,9 +637,9 @@ export type UserUncheckedCreateWithoutDepartmentInput = {
   position?: string | null
   joinedAt?: Date | string | null
   isActive?: boolean
+  shift: $Enums.Shift
   createdAt?: Date | string
   updatedAt?: Date | string
-  workSchedules?: Prisma.WorkScheduleUncheckedCreateNestedManyWithoutUserInput
   checkIns?: Prisma.CheckInUncheckedCreateNestedManyWithoutUserInput
   leaves?: Prisma.LeaveUncheckedCreateNestedManyWithoutUserInput
 }
@@ -679,92 +684,9 @@ export type UserScalarWhereInput = {
   position?: Prisma.StringNullableFilter<"User"> | string | null
   joinedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   isActive?: Prisma.BoolFilter<"User"> | boolean
+  shift?: Prisma.EnumShiftFilter<"User"> | $Enums.Shift
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-}
-
-export type UserCreateWithoutWorkSchedulesInput = {
-  id?: string
-  name: string
-  username: string
-  password: string
-  role?: $Enums.Role
-  imageUrl?: string | null
-  position?: string | null
-  joinedAt?: Date | string | null
-  isActive?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
-  checkIns?: Prisma.CheckInCreateNestedManyWithoutUserInput
-  leaves?: Prisma.LeaveCreateNestedManyWithoutUserInput
-}
-
-export type UserUncheckedCreateWithoutWorkSchedulesInput = {
-  id?: string
-  name: string
-  username: string
-  password: string
-  role?: $Enums.Role
-  imageUrl?: string | null
-  departmentId?: string | null
-  position?: string | null
-  joinedAt?: Date | string | null
-  isActive?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  checkIns?: Prisma.CheckInUncheckedCreateNestedManyWithoutUserInput
-  leaves?: Prisma.LeaveUncheckedCreateNestedManyWithoutUserInput
-}
-
-export type UserCreateOrConnectWithoutWorkSchedulesInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutWorkSchedulesInput, Prisma.UserUncheckedCreateWithoutWorkSchedulesInput>
-}
-
-export type UserUpsertWithoutWorkSchedulesInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutWorkSchedulesInput, Prisma.UserUncheckedUpdateWithoutWorkSchedulesInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutWorkSchedulesInput, Prisma.UserUncheckedCreateWithoutWorkSchedulesInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutWorkSchedulesInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutWorkSchedulesInput, Prisma.UserUncheckedUpdateWithoutWorkSchedulesInput>
-}
-
-export type UserUpdateWithoutWorkSchedulesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
-  checkIns?: Prisma.CheckInUpdateManyWithoutUserNestedInput
-  leaves?: Prisma.LeaveUpdateManyWithoutUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutWorkSchedulesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  checkIns?: Prisma.CheckInUncheckedUpdateManyWithoutUserNestedInput
-  leaves?: Prisma.LeaveUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCheckInsInput = {
@@ -777,10 +699,10 @@ export type UserCreateWithoutCheckInsInput = {
   position?: string | null
   joinedAt?: Date | string | null
   isActive?: boolean
+  shift: $Enums.Shift
   createdAt?: Date | string
   updatedAt?: Date | string
   department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
-  workSchedules?: Prisma.WorkScheduleCreateNestedManyWithoutUserInput
   leaves?: Prisma.LeaveCreateNestedManyWithoutUserInput
 }
 
@@ -795,9 +717,9 @@ export type UserUncheckedCreateWithoutCheckInsInput = {
   position?: string | null
   joinedAt?: Date | string | null
   isActive?: boolean
+  shift: $Enums.Shift
   createdAt?: Date | string
   updatedAt?: Date | string
-  workSchedules?: Prisma.WorkScheduleUncheckedCreateNestedManyWithoutUserInput
   leaves?: Prisma.LeaveUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -827,10 +749,10 @@ export type UserUpdateWithoutCheckInsInput = {
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
-  workSchedules?: Prisma.WorkScheduleUpdateManyWithoutUserNestedInput
   leaves?: Prisma.LeaveUpdateManyWithoutUserNestedInput
 }
 
@@ -845,9 +767,9 @@ export type UserUncheckedUpdateWithoutCheckInsInput = {
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  workSchedules?: Prisma.WorkScheduleUncheckedUpdateManyWithoutUserNestedInput
   leaves?: Prisma.LeaveUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -861,10 +783,10 @@ export type UserCreateWithoutLeavesInput = {
   position?: string | null
   joinedAt?: Date | string | null
   isActive?: boolean
+  shift: $Enums.Shift
   createdAt?: Date | string
   updatedAt?: Date | string
   department?: Prisma.DepartmentCreateNestedOneWithoutUsersInput
-  workSchedules?: Prisma.WorkScheduleCreateNestedManyWithoutUserInput
   checkIns?: Prisma.CheckInCreateNestedManyWithoutUserInput
 }
 
@@ -879,9 +801,9 @@ export type UserUncheckedCreateWithoutLeavesInput = {
   position?: string | null
   joinedAt?: Date | string | null
   isActive?: boolean
+  shift: $Enums.Shift
   createdAt?: Date | string
   updatedAt?: Date | string
-  workSchedules?: Prisma.WorkScheduleUncheckedCreateNestedManyWithoutUserInput
   checkIns?: Prisma.CheckInUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -911,10 +833,10 @@ export type UserUpdateWithoutLeavesInput = {
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   department?: Prisma.DepartmentUpdateOneWithoutUsersNestedInput
-  workSchedules?: Prisma.WorkScheduleUpdateManyWithoutUserNestedInput
   checkIns?: Prisma.CheckInUpdateManyWithoutUserNestedInput
 }
 
@@ -929,9 +851,9 @@ export type UserUncheckedUpdateWithoutLeavesInput = {
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  workSchedules?: Prisma.WorkScheduleUncheckedUpdateManyWithoutUserNestedInput
   checkIns?: Prisma.CheckInUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -945,6 +867,7 @@ export type UserCreateManyDepartmentInput = {
   position?: string | null
   joinedAt?: Date | string | null
   isActive?: boolean
+  shift: $Enums.Shift
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -959,9 +882,9 @@ export type UserUpdateWithoutDepartmentInput = {
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  workSchedules?: Prisma.WorkScheduleUpdateManyWithoutUserNestedInput
   checkIns?: Prisma.CheckInUpdateManyWithoutUserNestedInput
   leaves?: Prisma.LeaveUpdateManyWithoutUserNestedInput
 }
@@ -976,9 +899,9 @@ export type UserUncheckedUpdateWithoutDepartmentInput = {
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  workSchedules?: Prisma.WorkScheduleUncheckedUpdateManyWithoutUserNestedInput
   checkIns?: Prisma.CheckInUncheckedUpdateManyWithoutUserNestedInput
   leaves?: Prisma.LeaveUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -993,6 +916,7 @@ export type UserUncheckedUpdateManyWithoutDepartmentInput = {
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   joinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  shift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1003,13 +927,11 @@ export type UserUncheckedUpdateManyWithoutDepartmentInput = {
  */
 
 export type UserCountOutputType = {
-  workSchedules: number
   checkIns: number
   leaves: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  workSchedules?: boolean | UserCountOutputTypeCountWorkSchedulesArgs
   checkIns?: boolean | UserCountOutputTypeCountCheckInsArgs
   leaves?: boolean | UserCountOutputTypeCountLeavesArgs
 }
@@ -1022,13 +944,6 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
    * Select specific fields to fetch from the UserCountOutputType
    */
   select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null
-}
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountWorkSchedulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.WorkScheduleWhereInput
 }
 
 /**
@@ -1057,10 +972,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   position?: boolean
   joinedAt?: boolean
   isActive?: boolean
+  shift?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   department?: boolean | Prisma.User$departmentArgs<ExtArgs>
-  workSchedules?: boolean | Prisma.User$workSchedulesArgs<ExtArgs>
   checkIns?: boolean | Prisma.User$checkInsArgs<ExtArgs>
   leaves?: boolean | Prisma.User$leavesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1077,6 +992,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   position?: boolean
   joinedAt?: boolean
   isActive?: boolean
+  shift?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   department?: boolean | Prisma.User$departmentArgs<ExtArgs>
@@ -1093,6 +1009,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   position?: boolean
   joinedAt?: boolean
   isActive?: boolean
+  shift?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   department?: boolean | Prisma.User$departmentArgs<ExtArgs>
@@ -1109,14 +1026,14 @@ export type UserSelectScalar = {
   position?: boolean
   joinedAt?: boolean
   isActive?: boolean
+  shift?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "username" | "password" | "role" | "imageUrl" | "departmentId" | "position" | "joinedAt" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "username" | "password" | "role" | "imageUrl" | "departmentId" | "position" | "joinedAt" | "isActive" | "shift" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   department?: boolean | Prisma.User$departmentArgs<ExtArgs>
-  workSchedules?: boolean | Prisma.User$workSchedulesArgs<ExtArgs>
   checkIns?: boolean | Prisma.User$checkInsArgs<ExtArgs>
   leaves?: boolean | Prisma.User$leavesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1132,7 +1049,6 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "User"
   objects: {
     department: Prisma.$DepartmentPayload<ExtArgs> | null
-    workSchedules: Prisma.$WorkSchedulePayload<ExtArgs>[]
     checkIns: Prisma.$CheckInPayload<ExtArgs>[]
     leaves: Prisma.$LeavePayload<ExtArgs>[]
   }
@@ -1147,6 +1063,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     position: string | null
     joinedAt: Date | null
     isActive: boolean
+    shift: $Enums.Shift
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -1544,7 +1461,6 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   department<T extends Prisma.User$departmentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$departmentArgs<ExtArgs>>): Prisma.Prisma__DepartmentClient<runtime.Types.Result.GetResult<Prisma.$DepartmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  workSchedules<T extends Prisma.User$workSchedulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$workSchedulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkSchedulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   checkIns<T extends Prisma.User$checkInsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$checkInsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CheckInPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   leaves<T extends Prisma.User$leavesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$leavesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LeavePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1586,6 +1502,7 @@ export interface UserFieldRefs {
   readonly position: Prisma.FieldRef<"User", 'String'>
   readonly joinedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly isActive: Prisma.FieldRef<"User", 'Boolean'>
+  readonly shift: Prisma.FieldRef<"User", 'Shift'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }
@@ -2005,30 +1922,6 @@ export type User$departmentArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   include?: Prisma.DepartmentInclude<ExtArgs> | null
   where?: Prisma.DepartmentWhereInput
-}
-
-/**
- * User.workSchedules
- */
-export type User$workSchedulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the WorkSchedule
-   */
-  select?: Prisma.WorkScheduleSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the WorkSchedule
-   */
-  omit?: Prisma.WorkScheduleOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.WorkScheduleInclude<ExtArgs> | null
-  where?: Prisma.WorkScheduleWhereInput
-  orderBy?: Prisma.WorkScheduleOrderByWithRelationInput | Prisma.WorkScheduleOrderByWithRelationInput[]
-  cursor?: Prisma.WorkScheduleWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.WorkScheduleScalarFieldEnum | Prisma.WorkScheduleScalarFieldEnum[]
 }
 
 /**

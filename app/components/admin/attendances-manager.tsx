@@ -379,6 +379,11 @@ export function AttendancesManager({
                       <Badge variant={statusVariant[c.status] ?? "secondary"}>
                         {label(c.status)}
                       </Badge>
+                      {c.status === "LATE" && c.lateMinutes > 0 ? (
+                        <div className="mt-1 text-xs text-muted-foreground">
+                          Telat {c.lateMinutes} menit
+                        </div>
+                      ) : null}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
