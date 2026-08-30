@@ -135,7 +135,7 @@ export default function LoginPage() {
       </div>
 
       <p className="mt-16 text-xs text-zinc-400">
-        Satak Office Attendance · © {new Date().getFullYear()}
+        Satak SaaS · © {new Date().getFullYear()}
       </p>
     </main>
   )
