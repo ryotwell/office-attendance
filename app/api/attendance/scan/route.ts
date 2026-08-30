@@ -2,17 +2,23 @@ import { NextResponse } from "next/server"
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
+import { isWithinOfficeRadius, OFFICE_RADIUS_METERS } from "@/lib/geo"
 
 const QR_CODE_KEY = process.env.ATTEDANCE_QRCODE_KEY
 
-// POST /api/attendance/scan  { token }
-// Kiosk scan: token harus cocok dengan ATTEDANCE_QRCODE_KEY di .env. Scan
-// pertama dalam sehari = clock in; scan berikutnya = clock out. Absensi
-// berlaku setiap hari kecuali Minggu (tidak ada cek WorkSchedule per hari —
-// satu jadwal berlaku untuk semua hari kerja).
-// Clock-in ditolak sebelum shift.startTime dan setelah shift.endTime.
-// Clock-out ditolak sebelum shift.endTime (tidak boleh pulang lebih awal).
-// Shift start (+ toleransi) menentukan status PRESENT/LATE.
+// POST /api/attendance/scan  { token, latitude, longitude }
+// Employee self-scan: QR is a static code physically posted at the office
+// (not per-session/rotating), scanned by the employee's own phone. Because
+// the QR itself carries no location proof once photographed, the browser's
+// geolocation at scan time is required and checked against OFFICE_RADIUS_METERS
+// in lib/geo.ts — this is what actually enforces "must be physically at the
+// office", not the QR token match.
+// First scan of a day clocks in; a later scan clocks out. Attendance works
+// every day except Sunday (no WorkSchedule check per day — a schedule
+// applies daily).
+// Clock-in is rejected before shift.startTime and after shift.endTime.
+// Clock-out is rejected before shift.endTime (no early clock-out).
+// Shift start (+grace) decides PRESENT/LATE.
 export async function POST(req: Request) {
   const session = await auth()
   if (!session?.user?.id) {
@@ -25,13 +31,31 @@ export async function POST(req: Request) {
     )
   }
 
-  const { token } = await req.json().catch(() => ({}))
+  const { token, latitude, longitude } = await req.json().catch(() => ({}))
   if (typeof token !== "string" || !token.trim()) {
     return NextResponse.json({ error: "Token QR tidak ada" }, { status: 400 })
   }
 
   if (token.trim() !== QR_CODE_KEY) {
     return NextResponse.json({ error: "Kode QR tidak valid" }, { status: 403 })
+  }
+
+  // Lokasi wajib dikirim dari browser (navigator.geolocation di client).
+  // Tanpa ini, QR statis yang sudah difoto bisa dipakai absen dari mana saja.
+  if (typeof latitude !== "number" || typeof longitude !== "number") {
+    return NextResponse.json(
+      { error: "Lokasi tidak terdeteksi. Aktifkan akses lokasi di browser Anda" },
+      { status: 400 }
+    )
+  }
+
+  if (!isWithinOfficeRadius(latitude, longitude)) {
+    return NextResponse.json(
+      {
+        error: `Anda berada di luar radius kantor (maks ${OFFICE_RADIUS_METERS}m). Absen hanya bisa dilakukan di lokasi kantor`,
+      },
+      { status: 403 }
+    )
   }
 
   const user = await prisma.user.findUnique({

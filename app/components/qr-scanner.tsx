@@ -6,6 +6,23 @@ import { Html5Qrcode } from "html5-qrcode"
 
 type ScanState = "idle" | "scanning" | "success" | "error"
 
+// Ambil posisi GPS sekali dari browser. enableHighAccuracy supaya HP pakai
+// GPS chip (bukan cuma cell tower/wifi triangulation) — penting karena
+// radius toleransi kantor cuma OFFICE_RADIUS_METERS.
+function getCurrentPosition(): Promise<GeolocationPosition> {
+  return new Promise((resolve, reject) => {
+    if (!("geolocation" in navigator)) {
+      reject(new Error("Geolocation tidak didukung browser ini"))
+      return
+    }
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
+      enableHighAccuracy: true,
+      timeout: 10_000,
+      maximumAge: 0,
+    })
+  })
+}
+
 export function QrScanner() {
   const scannerRef = useRef<Html5Qrcode | null>(null)
   const initializedRef = useRef(false)
@@ -23,13 +40,37 @@ export function QrScanner() {
     }
 
     setState("scanning")
+    setMessage("Mendapatkan lokasi…")
+
+    // Ambil GPS SETELAH kode terdeteksi (bukan di awal mount) supaya prompt
+    // izin lokasi browser muncul tepat saat user benar-benar mau absen, dan
+    // posisinya paling baru saat submit.
+    let coords: { latitude: number; longitude: number }
+    try {
+      const position = await getCurrentPosition()
+      coords = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      }
+    } catch {
+      setState("error")
+      setMessage(
+        "Tidak bisa mengambil lokasi. Aktifkan izin lokasi lalu coba lagi"
+      )
+      return
+    }
+
     setMessage("Mengirim…")
 
     try {
       const res = await fetch("/api/attendance/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: decodedText }),
+        body: JSON.stringify({
+          token: decodedText,
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        }),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
@@ -138,7 +179,7 @@ export function QrScanner() {
         }`}
       >
         {state === "scanning" && <span>Sedang scan…</span>}
-        {message || (state === "idle" ? "Arahkan kamera ke kode QRCode" : "")}
+        {message || (state === "idle" ? "Arahkan kamera ke kode QR Kantor" : "")}
       </div>
     </div>
   )
