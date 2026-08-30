@@ -11,6 +11,16 @@ import {
   FormSelect,
   SubmitButton,
 } from "@/app/components/admin/form"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -36,8 +46,19 @@ type ShiftDetail = {
   endTime: string
 }
 
+type EmployeeRow = {
+  id: string
+  name: string
+  username: string
+  role: RoleType
+  position: string | null
+  joinedAt: Date | null
+  departmentId: string | null
+  department: { name: string } | null
+  shift: ShiftType
+}
+
 const roleOptions = Object.values(Role).map((v) => ({ value: v, label: v }))
-// const shiftOptions = Object.values(Shift).map((v) => ({ value: v, label: v }))
 const shiftData = shifts as Record<string, ShiftDetail>
 
 const shiftOptions = Object.values(Shift).map((v) => {
@@ -45,7 +66,7 @@ const shiftOptions = Object.values(Shift).map((v) => {
 
   return {
     value: v,
-    label: `${v} (${shift.startTime} - ${shift.endTime})`,
+    label: v !== 'PAGIATAUSIANG' ? `${v} (${shift.startTime} - ${shift.endTime})` : `PAGI atau SIANG`,
   }
 })
 
@@ -63,21 +84,12 @@ export function EmployeesManager({
   employees,
   departments,
 }: {
-  employees: Array<{
-    id: string
-    name: string
-    username: string
-    role: RoleType
-    position: string | null
-    joinedAt: Date | null
-    departmentId: string | null
-    department: { name: string } | null
-    shift: ShiftType
-  }>
+  employees: EmployeeRow[]
   departments: Array<{ id: string; name: string }>
 }) {
   const [open, setOpen] = React.useState(false)
-  const [editing, setEditing] = React.useState<typeof employees[number] | null>(null)
+  const [editing, setEditing] = React.useState<EmployeeRow | null>(null)
+  const [deleteTarget, setDeleteTarget] = React.useState<EmployeeRow | null>(null)
   const [state, formAction, pending] = useActionState(upsertEmployee, {
     error: undefined,
   })
@@ -86,7 +98,7 @@ export function EmployeesManager({
     setEditing(null)
     setOpen(true)
   }
-  const openEdit = (row: typeof employees[number]) => {
+  const openEdit = (row: EmployeeRow) => {
     setEditing(row)
     setOpen(true)
   }
@@ -132,11 +144,13 @@ export function EmployeesManager({
                       <Button variant="ghost" size="icon-sm" onClick={() => openEdit(emp)}>
                         <Pencil />
                       </Button>
-                      <form action={deleteEmployee.bind(null, emp.id)}>
-                        <Button variant="ghost" size="icon-sm" type="submit">
-                          <Trash2 />
-                        </Button>
-                      </form>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => setDeleteTarget(emp)}
+                      >
+                        <Trash2 />
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -220,6 +234,41 @@ export function EmployeesManager({
           </form>
         </SheetContent>
       </Sheet>
+
+      <AlertDialog
+        open={deleteTarget !== null}
+        onOpenChange={(next) => {
+          if (!next) setDeleteTarget(null)
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus karyawan ini?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteTarget
+                ? `Tindakan ini akan menghapus akun "${deleteTarget.name}" (${deleteTarget.username}) secara permanen. Data ini tidak bisa dikembalikan.`
+                : ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <form
+              action={async () => {
+                if (!deleteTarget) return
+                await deleteEmployee(deleteTarget.id)
+                setDeleteTarget(null)
+              }}
+            >
+              <AlertDialogAction
+                type="submit"
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Hapus
+              </AlertDialogAction>
+            </form>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

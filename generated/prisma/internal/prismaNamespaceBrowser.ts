@@ -110,6 +110,7 @@ export const CheckInScalarFieldEnum = {
   status: 'status',
   lateMinutes: 'lateMinutes',
   notes: 'notes',
+  effectiveShift: 'effectiveShift',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

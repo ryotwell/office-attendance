@@ -48,6 +48,7 @@ enum Shift {
   PAGI
   SIANG
   FULLTIME
+  PAGIATAUSIANG
 }
 
 model User {
@@ -91,6 +92,7 @@ model CheckIn {
   status      AttendanceStatus @default(PRESENT)
   lateMinutes Int              @default(0)
   notes       String?
+  effectiveShift  Shift
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 

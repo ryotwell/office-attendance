@@ -19,6 +19,14 @@ const STATUS_LABEL: Record<string, string> = {
   ON_LEAVE: "Cuti",
 }
 
+// Label shift untuk laporan.
+const SHIFT_LABEL: Record<string, string> = {
+  PAGI: "Pagi",
+  SIANG: "Siang",
+  FULLTIME: "Fulltime",
+  PAGIATAUSIANG: "Rolling (Pagi/Siang)",
+}
+
 const DAY_LABEL = [
   "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu",
 ]
@@ -207,7 +215,10 @@ export async function GET(req: NextRequest) {
     day: dayOf(c.date),
     name: c.user.name,
     department: c.user.department?.name ?? "-",
-    shift: c.user.shift,
+    // Tampilkan shift EFEKTIF hari itu (dari CheckIn), bukan User.shift
+    // mentah — untuk pegawai rolling (PAGIATAUSIANG) ini menunjukkan
+    // apakah hari itu dia masuk sesi Pagi atau Siang.
+    shift: SHIFT_LABEL[c.effectiveShift] ?? c.effectiveShift,
     clockIn: timeOf(c.clockIn),
     clockOut: timeOf(c.clockOut),
     duration: duration(c.clockIn, c.clockOut),

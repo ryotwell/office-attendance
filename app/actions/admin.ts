@@ -230,6 +230,7 @@ const checkInSchema = z.object({
   status: z.nativeEnum(AttendanceStatus),
   lateMinutes: z.coerce.number().int().min(0).max(1440),
   notes: z.string().trim().max(500).optional().or(z.literal("")),
+  effectiveShift: z.nativeEnum(Shift),
 })
 
 function toDateTime(value: string) {
@@ -283,6 +284,7 @@ export async function upsertCheckIn(
           status: data.status,
           lateMinutes: data.lateMinutes,
           notes: data.notes || null,
+          effectiveShift: data.effectiveShift,
         },
       })
     } catch {

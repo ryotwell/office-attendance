@@ -43,6 +43,7 @@ export type CheckInMinAggregateOutputType = {
   status: $Enums.AttendanceStatus | null
   lateMinutes: number | null
   notes: string | null
+  effectiveShift: $Enums.Shift | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,6 +57,7 @@ export type CheckInMaxAggregateOutputType = {
   status: $Enums.AttendanceStatus | null
   lateMinutes: number | null
   notes: string | null
+  effectiveShift: $Enums.Shift | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -69,6 +71,7 @@ export type CheckInCountAggregateOutputType = {
   status: number
   lateMinutes: number
   notes: number
+  effectiveShift: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -92,6 +95,7 @@ export type CheckInMinAggregateInputType = {
   status?: true
   lateMinutes?: true
   notes?: true
+  effectiveShift?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -105,6 +109,7 @@ export type CheckInMaxAggregateInputType = {
   status?: true
   lateMinutes?: true
   notes?: true
+  effectiveShift?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -118,6 +123,7 @@ export type CheckInCountAggregateInputType = {
   status?: true
   lateMinutes?: true
   notes?: true
+  effectiveShift?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -218,6 +224,7 @@ export type CheckInGroupByOutputType = {
   status: $Enums.AttendanceStatus
   lateMinutes: number
   notes: string | null
+  effectiveShift: $Enums.Shift
   createdAt: Date
   updatedAt: Date
   _count: CheckInCountAggregateOutputType | null
@@ -254,6 +261,7 @@ export type CheckInWhereInput = {
   status?: Prisma.EnumAttendanceStatusFilter<"CheckIn"> | $Enums.AttendanceStatus
   lateMinutes?: Prisma.IntFilter<"CheckIn"> | number
   notes?: Prisma.StringNullableFilter<"CheckIn"> | string | null
+  effectiveShift?: Prisma.EnumShiftFilter<"CheckIn"> | $Enums.Shift
   createdAt?: Prisma.DateTimeFilter<"CheckIn"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CheckIn"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -268,6 +276,7 @@ export type CheckInOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   lateMinutes?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  effectiveShift?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -286,6 +295,7 @@ export type CheckInWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumAttendanceStatusFilter<"CheckIn"> | $Enums.AttendanceStatus
   lateMinutes?: Prisma.IntFilter<"CheckIn"> | number
   notes?: Prisma.StringNullableFilter<"CheckIn"> | string | null
+  effectiveShift?: Prisma.EnumShiftFilter<"CheckIn"> | $Enums.Shift
   createdAt?: Prisma.DateTimeFilter<"CheckIn"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CheckIn"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -300,6 +310,7 @@ export type CheckInOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   lateMinutes?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  effectiveShift?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.CheckInCountOrderByAggregateInput
@@ -321,6 +332,7 @@ export type CheckInScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumAttendanceStatusWithAggregatesFilter<"CheckIn"> | $Enums.AttendanceStatus
   lateMinutes?: Prisma.IntWithAggregatesFilter<"CheckIn"> | number
   notes?: Prisma.StringNullableWithAggregatesFilter<"CheckIn"> | string | null
+  effectiveShift?: Prisma.EnumShiftWithAggregatesFilter<"CheckIn"> | $Enums.Shift
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"CheckIn"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"CheckIn"> | Date | string
 }
@@ -333,6 +345,7 @@ export type CheckInCreateInput = {
   status?: $Enums.AttendanceStatus
   lateMinutes?: number
   notes?: string | null
+  effectiveShift: $Enums.Shift
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutCheckInsInput
@@ -347,6 +360,7 @@ export type CheckInUncheckedCreateInput = {
   status?: $Enums.AttendanceStatus
   lateMinutes?: number
   notes?: string | null
+  effectiveShift: $Enums.Shift
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -359,6 +373,7 @@ export type CheckInUpdateInput = {
   status?: Prisma.EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
   lateMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  effectiveShift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutCheckInsNestedInput
@@ -373,6 +388,7 @@ export type CheckInUncheckedUpdateInput = {
   status?: Prisma.EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
   lateMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  effectiveShift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -386,6 +402,7 @@ export type CheckInCreateManyInput = {
   status?: $Enums.AttendanceStatus
   lateMinutes?: number
   notes?: string | null
+  effectiveShift: $Enums.Shift
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -398,6 +415,7 @@ export type CheckInUpdateManyMutationInput = {
   status?: Prisma.EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
   lateMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  effectiveShift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -411,6 +429,7 @@ export type CheckInUncheckedUpdateManyInput = {
   status?: Prisma.EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
   lateMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  effectiveShift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -439,6 +458,7 @@ export type CheckInCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   lateMinutes?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  effectiveShift?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -456,6 +476,7 @@ export type CheckInMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   lateMinutes?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  effectiveShift?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -469,6 +490,7 @@ export type CheckInMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   lateMinutes?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  effectiveShift?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -539,6 +561,7 @@ export type CheckInCreateWithoutUserInput = {
   status?: $Enums.AttendanceStatus
   lateMinutes?: number
   notes?: string | null
+  effectiveShift: $Enums.Shift
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -551,6 +574,7 @@ export type CheckInUncheckedCreateWithoutUserInput = {
   status?: $Enums.AttendanceStatus
   lateMinutes?: number
   notes?: string | null
+  effectiveShift: $Enums.Shift
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -593,6 +617,7 @@ export type CheckInScalarWhereInput = {
   status?: Prisma.EnumAttendanceStatusFilter<"CheckIn"> | $Enums.AttendanceStatus
   lateMinutes?: Prisma.IntFilter<"CheckIn"> | number
   notes?: Prisma.StringNullableFilter<"CheckIn"> | string | null
+  effectiveShift?: Prisma.EnumShiftFilter<"CheckIn"> | $Enums.Shift
   createdAt?: Prisma.DateTimeFilter<"CheckIn"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CheckIn"> | Date | string
 }
@@ -605,6 +630,7 @@ export type CheckInCreateManyUserInput = {
   status?: $Enums.AttendanceStatus
   lateMinutes?: number
   notes?: string | null
+  effectiveShift: $Enums.Shift
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -617,6 +643,7 @@ export type CheckInUpdateWithoutUserInput = {
   status?: Prisma.EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
   lateMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  effectiveShift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -629,6 +656,7 @@ export type CheckInUncheckedUpdateWithoutUserInput = {
   status?: Prisma.EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
   lateMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  effectiveShift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -641,6 +669,7 @@ export type CheckInUncheckedUpdateManyWithoutUserInput = {
   status?: Prisma.EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
   lateMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  effectiveShift?: Prisma.EnumShiftFieldUpdateOperationsInput | $Enums.Shift
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -656,6 +685,7 @@ export type CheckInSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   status?: boolean
   lateMinutes?: boolean
   notes?: boolean
+  effectiveShift?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -670,6 +700,7 @@ export type CheckInSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   status?: boolean
   lateMinutes?: boolean
   notes?: boolean
+  effectiveShift?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -684,6 +715,7 @@ export type CheckInSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   status?: boolean
   lateMinutes?: boolean
   notes?: boolean
+  effectiveShift?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -698,11 +730,12 @@ export type CheckInSelectScalar = {
   status?: boolean
   lateMinutes?: boolean
   notes?: boolean
+  effectiveShift?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type CheckInOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "date" | "clockIn" | "clockOut" | "status" | "lateMinutes" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["checkIn"]>
+export type CheckInOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "date" | "clockIn" | "clockOut" | "status" | "lateMinutes" | "notes" | "effectiveShift" | "createdAt" | "updatedAt", ExtArgs["result"]["checkIn"]>
 export type CheckInInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -727,6 +760,7 @@ export type $CheckInPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     status: $Enums.AttendanceStatus
     lateMinutes: number
     notes: string | null
+    effectiveShift: $Enums.Shift
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["checkIn"]>
@@ -1161,6 +1195,7 @@ export interface CheckInFieldRefs {
   readonly status: Prisma.FieldRef<"CheckIn", 'AttendanceStatus'>
   readonly lateMinutes: Prisma.FieldRef<"CheckIn", 'Int'>
   readonly notes: Prisma.FieldRef<"CheckIn", 'String'>
+  readonly effectiveShift: Prisma.FieldRef<"CheckIn", 'Shift'>
   readonly createdAt: Prisma.FieldRef<"CheckIn", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"CheckIn", 'DateTime'>
 }

@@ -20,8 +20,8 @@ export default function ScanPage() {
           <Image
             src="/assets/logo.png"
             alt="Logo Satak Office Attendance"
-            width={48}
-            height={48}
+            width={80}
+            height={80}
             className="mx-auto mb-2 h-auto w-auto"
           />
           <CardTitle>{process.env.NEXT_PUBLIC_APP_NAME}</CardTitle>

@@ -245,25 +245,30 @@ export function AppSidebar({
                 align="end"
                 sideOffset={4}
               >
-                <DropdownMenuLabel className="p-0 font-normal">
-                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                    <Avatar className="size-8">
-                      <AvatarImage src={user?.image ?? ""} alt={user?.name ?? ""} />
-                      <AvatarFallback className="rounded-lg">
-                        {getInitials(user?.name ?? undefined)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-medium">
-                        {user?.name ?? "Pengguna"}
-                      </span>
-                      <span className="truncate text-xs text-muted-foreground">
-                        {user?.username}
-                      </span>
+                {/* DropdownMenuLabel must live inside a DropdownMenuGroup
+                    when using Base UI's Menu primitives, otherwise
+                    MenuGroupContext is missing and it throws at runtime. */}
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel className="p-0 font-normal">
+                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                      <Avatar className="size-8">
+                        <AvatarImage src={user?.image ?? ""} alt={user?.name ?? ""} />
+                        <AvatarFallback className="rounded-lg">
+                          {getInitials(user?.name ?? undefined)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-medium">
+                          {user?.name ?? "Pengguna"}
+                        </span>
+                        <span className="truncate text-xs text-muted-foreground">
+                          {user?.username}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
+                  </DropdownMenuLabel>
+                </DropdownMenuGroup>
+                {/* <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
                     <CircleUserRound />
@@ -273,7 +278,7 @@ export function AppSidebar({
                     <Clock />
                     Kehadiran Saya
                   </DropdownMenuItem>
-                </DropdownMenuGroup>
+                </DropdownMenuGroup> */}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   render={
