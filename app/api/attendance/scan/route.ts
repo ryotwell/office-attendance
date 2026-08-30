@@ -78,9 +78,9 @@ export async function POST(req: Request) {
   )
 
   // getDay(): 0 = Minggu → hari libur. (Hari kalender lokal, basis yang sama dengan `today`.)
-  if (now.getDay() === 0) {
-    return NextResponse.json({ error: "Hari Minggu libur" }, { status: 409 })
-  }
+  // if (now.getDay() === 0) {
+  //   return NextResponse.json({ error: "Hari Minggu libur" }, { status: 409 })
+  // }
 
   // Absensi membutuhkan WorkSchedule untuk user ini. Satu schedule bersifat
   // unik per user dan berlaku untuk setiap hari kerja.

@@ -18,20 +18,21 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { Building2 } from "lucide-react"
 
 export default function LoginPage() {
   const [error, formAction, isPending] = useActionState(loginAction, null)
 
   return (
     <div className="flex min-h-svh items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-sm shadow-2xl">
         <CardHeader className="text-center">
           <img
             src="/assets/logo.png"
             alt="Satak Office"
             className="mx-auto mb-2 h-12 w-auto"
           />
-          <CardTitle>Satak Office</CardTitle>
+          <CardTitle className="text-xl font-bold">{process.env.NEXT_PUBLIC_APP_NAME}</CardTitle>
           <CardDescription>Masuk ke akun Anda</CardDescription>
         </CardHeader>
         <CardContent>
@@ -44,7 +45,6 @@ export default function LoginPage() {
                   name="username"
                   type="text"
                   autoComplete="username"
-                  placeholder="nama.pengguna"
                   required
                 />
               </Field>
@@ -55,7 +55,6 @@ export default function LoginPage() {
                   name="password"
                   type="password"
                   autoComplete="current-password"
-                  placeholder="••••••••"
                   required
                 />
               </Field>
@@ -67,6 +66,17 @@ export default function LoginPage() {
           </form>
         </CardContent>
       </Card>
+
+      <footer className="absolute bottom-16 flex flex-col items-center gap-1 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <Building2 className="h-4 w-4" />
+          <span>Satak Office Attendance</span>
+        </div>
+
+        <span>
+          © {new Date().getFullYear()} Satak Saas. All rights reserved.
+        </span>
+      </footer>
     </div>
   )
 }

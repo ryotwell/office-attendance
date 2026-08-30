@@ -15,7 +15,7 @@ import { signOutAction } from "@/app/actions/auth"
 export default function ScanPage() {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-sm shadow-2xl">
         <CardHeader className="text-center">
           <Image
             src="/assets/logo.png"
@@ -24,13 +24,13 @@ export default function ScanPage() {
             height={48}
             className="mx-auto mb-2 h-auto w-auto"
           />
-          <CardTitle>Scan Absensi</CardTitle>
+          <CardTitle>{process.env.NEXT_PUBLIC_APP_NAME}</CardTitle>
           <CardDescription>Scan kode QR untuk check in</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <QrScanner />
           <form action={signOutAction}>
-            <Button type="submit" variant="outline" className="w-full">
+            <Button type="submit" variant="destructive" className="w-full">
               Keluar
             </Button>
           </form>
