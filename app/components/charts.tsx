@@ -84,14 +84,22 @@ export function Charts() {
           <CardTitle className="text-base">Kehadiran Mingguan</CardTitle>
           <CardDescription>Hadir, terlambat &amp; absen minggu ini</CardDescription>
         </CardHeader>
-        <ChartContainer config={attendanceConfig} className="aspect-auto h-[220px] w-full">
-          <AreaChart accessibilityLayer data={data.weekly}>
+        <ChartContainer
+          config={attendanceConfig}
+          className="aspect-auto h-[200px] w-full sm:h-[220px]"
+        >
+          <AreaChart
+            accessibilityLayer
+            data={data.weekly}
+            margin={{ left: 4, right: 4 }}
+          >
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="day"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
+              tick={{ fontSize: 11 }}
             />
             <ChartTooltip content={<ChartTooltipContent />} />
             <ChartLegend content={<ChartLegendContent />} />
@@ -128,14 +136,25 @@ export function Charts() {
           <CardTitle className="text-base">Kehadiran per Departemen</CardTitle>
           <CardDescription>Hadir vs jumlah karyawan</CardDescription>
         </CardHeader>
-        <ChartContainer config={departmentConfig} className="aspect-auto h-[220px] w-full">
-          <BarChart accessibilityLayer data={data.departments}>
+        <ChartContainer
+          config={departmentConfig}
+          className="aspect-auto h-[240px] w-full sm:h-[220px]"
+        >
+          <BarChart
+            accessibilityLayer
+            data={data.departments}
+            margin={{ left: 4, right: 4, bottom: 24 }}
+          >
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="dept"
               tickLine={false}
-              tickMargin={10}
               axisLine={false}
+              interval={0}
+              angle={-35}
+              textAnchor="end"
+              height={50}
+              tick={{ fontSize: 10 }}
             />
             <YAxis width={28} tickLine={false} axisLine={false} />
             <ChartTooltip

@@ -64,7 +64,7 @@ export default function LoginPage() {
                     type="text"
                     autoComplete="username"
                     placeholder="Masukkan nama pengguna"
-                    className="h-12 rounded-lg border-zinc-200 bg-transparent px-4 text-[15px] shadow-none placeholder:text-zinc-400 focus-visible:border-zinc-400 focus-visible:ring-0"
+                    className="h-12 rounded-lg border-zinc-200 bg-transparent px-4 text-[15px] shadow-none placeholder:text-zinc-400 focus-visible:border-primary focus-visible:ring-0"
                     required
                   />
                 </Field>
@@ -83,7 +83,7 @@ export default function LoginPage() {
                       type={showPassword ? "text" : "password"}
                       autoComplete="current-password"
                       placeholder="Masukkan kata sandi"
-                      className="h-12 rounded-lg border-zinc-200 bg-transparent px-4 pr-11 text-[15px] shadow-none placeholder:text-zinc-400 focus-visible:border-zinc-400 focus-visible:ring-0"
+                      className="h-12 rounded-lg border-zinc-200 bg-transparent px-4 pr-11 text-[15px] shadow-none placeholder:text-zinc-400 focus-visible:border-primary focus-visible:ring-0"
                       required
                     />
                     <button
@@ -94,7 +94,7 @@ export default function LoginPage() {
                           ? "Sembunyikan kata sandi"
                           : "Tampilkan kata sandi"
                       }
-                      className="absolute right-0 top-0 flex h-12 w-11 items-center justify-center text-zinc-400 transition-colors hover:text-zinc-600"
+                      className="absolute right-0 top-0 flex h-12 w-11 items-center justify-center text-zinc-400 transition-colors hover:text-primary"
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4" />
@@ -114,7 +114,7 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   disabled={isPending}
-                  className="mt-2 h-12 w-full gap-2 rounded-lg bg-zinc-900 text-[15px] font-medium text-white shadow-none hover:bg-zinc-800"
+                  className="mt-2 h-12 w-full gap-2 rounded-lg bg-primary text-[15px] font-medium text-primary-foreground shadow-none hover:bg-primary/90"
                 >
                   {isPending ? (
                     <>
