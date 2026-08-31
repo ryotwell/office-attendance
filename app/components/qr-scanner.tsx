@@ -6,6 +6,9 @@ import { Html5Qrcode } from "html5-qrcode"
 
 type ScanState = "idle" | "scanning" | "success" | "error"
 
+const SOUND_SUCCESS_SRC = "/success.mp3"
+const SOUND_FAILED_SRC = "/failed.mp3"
+
 // Ambil posisi GPS sekali dari browser. enableHighAccuracy supaya HP pakai
 // GPS chip (bukan cuma cell tower/wifi triangulation) — penting karena
 // radius toleransi kantor cuma OFFICE_RADIUS_METERS.
@@ -23,12 +26,75 @@ function getCurrentPosition(): Promise<GeolocationPosition> {
   })
 }
 
+// Preload satu file audio sampai benar-benar siap diputar tanpa jeda
+// (canplaythrough), bukan cuma sampai metadata kebaca.
+function preloadAudio(src: string): Promise<HTMLAudioElement> {
+  return new Promise((resolve, reject) => {
+    const audio = new Audio(src)
+    audio.preload = "auto"
+
+    const cleanup = () => {
+      audio.removeEventListener("canplaythrough", onReady)
+      audio.removeEventListener("error", onError)
+    }
+    const onReady = () => {
+      cleanup()
+      resolve(audio)
+    }
+    const onError = () => {
+      cleanup()
+      reject(new Error(`Gagal memuat audio: ${src}`))
+    }
+
+    audio.addEventListener("canplaythrough", onReady, { once: true })
+    audio.addEventListener("error", onError, { once: true })
+    audio.load()
+  })
+}
+
+// Putar dari awal setiap kali dipanggil (kalau lagi diputar & dipanggil
+// lagi cepat, restart daripada ditumpuk/di-skip).
+function playAudio(audio: HTMLAudioElement | null) {
+  if (!audio) return
+  audio.currentTime = 0
+  void audio.play().catch(() => {})
+}
+
 export function QrScanner() {
   const scannerRef = useRef<Html5Qrcode | null>(null)
   const initializedRef = useRef(false)
   const startInFlightRef = useRef(false)
+  const successAudioRef = useRef<HTMLAudioElement | null>(null)
+  const failedAudioRef = useRef<HTMLAudioElement | null>(null)
   const [state, setState] = useState<ScanState>("idle")
   const [message, setMessage] = useState("")
+  const [audioReady, setAudioReady] = useState(false)
+
+  // Load penuh success.mp3 & failed.mp3 dulu sebelum kamera/absensi
+  // diaktifkan, supaya suara tidak telat/putus di scan pertama.
+  useEffect(() => {
+    let cancelled = false
+
+    setMessage("Menyiapkan suara…")
+    Promise.all([preloadAudio(SOUND_SUCCESS_SRC), preloadAudio(SOUND_FAILED_SRC)])
+      .then(([success, failed]) => {
+        if (cancelled) return
+        successAudioRef.current = success
+        failedAudioRef.current = failed
+        setAudioReady(true)
+        setMessage("")
+      })
+      .catch(() => {
+        if (cancelled) return
+        // Tetap lanjut tanpa suara daripada mengunci absensi selamanya.
+        setAudioReady(true)
+        setMessage("")
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   // Bekukan scanner begitu sebuah kode berhasil didecode, supaya QR yang
   // masih disorongkan ke kamera tidak terus-menerus ke-scan berulang.
@@ -57,6 +123,7 @@ export function QrScanner() {
       setMessage(
         "Tidak bisa mengambil lokasi. Aktifkan izin lokasi lalu coba lagi"
       )
+      playAudio(failedAudioRef.current)
       return
     }
 
@@ -76,9 +143,11 @@ export function QrScanner() {
       if (!res.ok) {
         setState("error")
         setMessage(data.error ?? "Scan gagal")
+        playAudio(failedAudioRef.current)
         return
       }
       setState("success")
+      playAudio(successAudioRef.current)
       // QR yang sama. Scan pertama hari itu = clock in (clockOut masih
       // null); scan berikutnya = clock out — tampilkan mana yang terjadi.
       setMessage(
@@ -97,6 +166,7 @@ export function QrScanner() {
     } catch {
       setState("error")
       setMessage("Terjadi kesalahan jaringan, coba lagi")
+      playAudio(failedAudioRef.current)
     }
   }, [])
 
@@ -135,6 +205,7 @@ export function QrScanner() {
   }, [state, startScanner])
 
   useEffect(() => {
+    if (!audioReady) return
     if (initializedRef.current) return
     if (!document.getElementById("qr-reader")) return
     initializedRef.current = true
@@ -162,7 +233,7 @@ export function QrScanner() {
         void teardown()
       }
     }
-  }, [startScanner])
+  }, [audioReady, startScanner])
 
   return (
     <div className="flex flex-col gap-4">
@@ -179,7 +250,12 @@ export function QrScanner() {
         }`}
       >
         {state === "scanning" && <span>Sedang scan…</span>}
-        {message || (state === "idle" ? "Arahkan kamera ke kode QR Kantor" : "")}
+        {message ||
+          (!audioReady
+            ? "Menyiapkan suara…"
+            : state === "idle"
+              ? "Arahkan kamera ke kode QR Kantor"
+              : "")}
       </div>
     </div>
   )
