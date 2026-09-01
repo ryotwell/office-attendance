@@ -7,6 +7,10 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME}
+        OFFICE_LATITUDE: ${OFFICE_LATITUDE}
+        OFFICE_LONGITUDE: ${OFFICE_LONGITUDE}
+        OFFICE_RADIUS_METERS: ${OFFICE_RADIUS_METERS}
+
     env_file:
       - .env
 
