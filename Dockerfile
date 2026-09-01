@@ -38,9 +38,12 @@ COPY . .
 # NEXT_PUBLIC_* harus tersedia SAAT BUILD (bukan cuma runtime),
 # karena Next.js meng-inline nilainya ke bundle client di sini.
 ARG NEXT_PUBLIC_APP_NAME
-ENV NEXT_PUBLIC_APP_NAME=$NEXT_PUBLIC_APP_NAME
+# Konfigurasi lokasi kantor tersedia saat build dan runtime.
+ENV OFFICE_LATITUDE=-8.644041
+ENV OFFICE_LONGITUDE=116.518364
+ENV OFFICE_RADIUS_METERS=50
 
-ENV NEXT_TELEMETRY_DISABLED=1
+
 
 RUN npm run build
 
